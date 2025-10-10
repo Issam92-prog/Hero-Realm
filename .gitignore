@@ -65,3 +65,5 @@ compile_commands.json
 .DS_Store
 Thumbs.db
 desktop.ini
+.vs/
+HeroReal/.vs/
