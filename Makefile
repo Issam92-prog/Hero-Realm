@@ -1,19 +1,22 @@
 CXX = g++
-CXXFLAGS = -std=c++17 -Wall -Wextra -O2
+CXXFLAGS = -std=c++17 -Wall -Wextra -O2 -Iinclude
 
 SRC_DIR = src
 OBJ_DIR = build
 BIN = hero_realms
 
-SRC = $(wildcard $(SRC_DIR)/*.cpp)
-OBJ = $(SRC:$(SRC_DIR)/%.cpp=$(OBJ_DIR)/%.o)
+SRC = $(shell find $(SRC_DIR) -name "*.cpp")
+OBJ = $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(SRC))
 
 all: $(BIN)
 
 $(BIN): $(OBJ)
+	@echo "🔗 Linking $@"
 	$(CXX) $(CXXFLAGS) -o $@ $^
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp | $(OBJ_DIR)
+	@mkdir -p $(dir $@)
+	@echo "⚙️  Compiling $<"
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 $(OBJ_DIR):
