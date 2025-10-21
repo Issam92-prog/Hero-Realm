@@ -18,10 +18,7 @@ public:
     int cout() const { return cout_; }
 
     // Jouer la carte
-    virtual void jouer(Joueur* joueur) {
-        if (or_ > 0) joueur->ajouterOr(or_);
-        if (combat_ > 0) joueur->ajouterCombat(combat_);
-    }
+    virtual void jouer(Joueur* joueur);
 
     // Affichage
     virtual void afficher(std::ostream& out = std::cout) const {
