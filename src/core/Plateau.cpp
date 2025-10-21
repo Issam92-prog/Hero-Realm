@@ -38,6 +38,10 @@ void Plateau::demarrer() {
     if (demarree_) return;
     if (joueurs_.size() < 2)
         throw runtime_error("Il faut au moins 2 joueurs pour démarrer.");
+    
+    // Initialiser le marché
+    marche_.initialiser();
+    
     demarree_ = true;
     terminee_ = false;
     idx_ = 0;

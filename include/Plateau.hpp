@@ -1,6 +1,7 @@
 #pragma once
 #include <memory>
 #include <vector>
+#include "zone/marche.hpp"
 
 // Déclaration anticipée de Joueur (évite les inclusions circulaires)
 class Joueur;
@@ -29,9 +30,16 @@ public:
     bool estDemarree() const { return demarree_; }
     bool estTerminee() const { return terminee_; }
 
+    // Accès au marché
+    Marche& marche() { return marche_; }
+    const Marche& marche() const { return marche_; }
+
+private:
+
 private:
     vector<unique_ptr<Joueur>> joueurs_;
     int  idx_      = 0;
     bool demarree_ = false;
     bool terminee_ = false;
+    Marche marche_;
 };
