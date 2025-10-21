@@ -1,5 +1,6 @@
 CXX = g++
-CXXFLAGS = -std=c++17 -Wall -Wextra -O2 -Iinclude
+CXXFLAGS = -std=c++17 -Wall -Wextra -O2
+CPPFLAGS = -Iinclude
 
 SRC_DIR = src
 OBJ_DIR = build
@@ -12,12 +13,12 @@ all: $(BIN)
 
 $(BIN): $(OBJ)
 	@echo "🔗 Linking $@"
-	$(CXX) $(CXXFLAGS) -o $@ $^
+	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -o $@ $^
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp | $(OBJ_DIR)
 	@mkdir -p $(dir $@)
-	@echo "⚙️  Compiling $<"
-	$(CXX) $(CXXFLAGS) -c $< -o $@
+	@echo " Compiling $<"
+	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
 $(OBJ_DIR):
 	mkdir -p $(OBJ_DIR)
