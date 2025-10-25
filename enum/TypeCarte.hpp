@@ -2,7 +2,7 @@
 using namespace std;
 
 enum TypeCarte {
-    Action,
-    Objet,
-    Champion,
+    CHAMPION,
+    ACTION,
+    ITEM,
 };
