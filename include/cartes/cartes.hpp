@@ -1,47 +1,42 @@
-#pragma once
-#include <string>
-#include <iostream>
+#ifndef CARTE_HPP
+#define CARTE_HPP
 
-class Joueur;  // Forward declaration
+#include <string>
+#include "enum/Faction.hpp"
+#include "enum/TypeCarte.hpp"
+
+class Joueur;
 
 class Carte {
+protected:
+    int quantity;
+    std::string nom;
+    std::string description;
+    TypeCarte type;
+    Faction faction;
+    int cout;
+
 public:
-    Carte(const std::string& nom, int orValeur, int combatValeur, int cout = 0)
-        : nom_(nom), or_(orValeur), combat_(combatValeur), cout_(cout) {}
+    Carte(int quantity, const std::string& nom, int cout, Faction faction, TypeCarte type);
+    virtual ~Carte();
     
-    virtual ~Carte() = default;
+    // Getters
+    int getQuantity() const;
+    std::string getNom() const;
+    std::string getDescription() const;
+    int getCout() const;
+    Faction getFaction() const;
+    TypeCarte getType() const;
 
-    // Accesseurs
-    const std::string& nom() const { return nom_; }
-    int orValeur() const { return or_; }
-    int combatValeur() const { return combat_; }
-    int cout() const { return cout_; }
+    // Setters
+    void setQuantity(int q);
+    void setDescription(const std::string& desc);  // <-- AJOUT
 
-    // Jouer la carte
-    virtual void jouer(Joueur* joueur);
+    // Méthode virtuelle pure pour jouer la carte
+    virtual void jouer(Joueur* joueur) = 0;
 
     // Affichage
-    virtual void afficher(std::ostream& out = std::cout) const {
-        out << nom_;
-        if (or_ > 0 || combat_ > 0) {
-            out << " (+";
-            if (or_ > 0) out << or_ << "💰";  // symbole pièce pour l'or
-            if (or_ > 0 && combat_ > 0) out << ", ";
-            if (combat_ > 0) out << combat_ << "⚔️";  // symbole épée pour le combat
-            out << ")";
-        }
-        if (cout_ > 0) out << " [Coût:" << cout_ << "]";
-    }
-
-private:
-    std::string nom_;
-    int or_;
-    int combat_;
-    int cout_;  // Coût d'achat de la carte
+    virtual void afficher() const;
 };
 
-// Surcharge de l'opérateur << pour l'affichage
-inline std::ostream& operator<<(std::ostream& out, const Carte& carte) {
-    carte.afficher(out);
-    return out;
-}
+#endif

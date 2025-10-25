@@ -2,9 +2,9 @@
 using namespace std;
 
 enum faction {
-    Neutre,
-    Guilde,
-    Necros,
-    Imperiale,
-    Sauvage,
+    IMPERIAL,
+    GUILD,
+    NECROS,
+    WILD,
+    NONE
 };
