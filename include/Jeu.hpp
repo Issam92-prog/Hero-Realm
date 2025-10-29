@@ -3,7 +3,7 @@
 
 #include <string>
 #include <vector>
-#include "Plateau/Plateau.hpp"
+#include "Plateau.hpp"
 
 class Joueur;
 class Carte;

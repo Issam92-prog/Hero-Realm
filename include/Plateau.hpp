@@ -3,9 +3,13 @@
 
 #include <vector>
 #include <memory>
+#include <cstdint>                    // ← Ajouter pour uint32_t
 #include "zone/Marche.hpp"
+#include "Joueur/Joueur.hpp"          // ← REMPLACER "class Joueur;" par cette ligne
 
-class Joueur;
+// SUPPRIMER cette ligne :
+// class Joueur;  ← ❌ ENLEVER CETTE LIGNE
+
 class Carte;
 
 /**
@@ -144,7 +148,7 @@ public:
      * @param id ID du joueur
      * @return Joueur* Pointeur vers le joueur (nullptr si non trouvé)
      */
-    Joueur* getJoueurParId(Joueur::Id id);
+    Joueur* getJoueurParId(std::uint32_t id);  // ← Ou utiliser directement uint32_t
 
     /**
      * @brief Nombre de joueurs
@@ -198,14 +202,14 @@ private:
 
     /**
      * @brief Génère un ID unique pour un joueur
-     * @return Joueur::Id Un ID unique
+     * @return std::uint32_t Un ID unique
      */
-    Joueur::Id genererIdJoueur();
+    std::uint32_t genererIdJoueur();     // ← Ou utiliser directement uint32_t
 
     /**
      * @brief Prochain ID disponible
      */
-    Joueur::Id prochain_id_;
+    std::uint32_t prochain_id_;          // ← Ou utiliser directement uint32_t
 };
 
 #endif // PLATEAU_HPP

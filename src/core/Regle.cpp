@@ -1,4 +1,4 @@
-#include "Jeu/Regle.hpp"
+#include "Regle.hpp"
 #include <iostream>
 #include <limits>
 

@@ -1,12 +1,8 @@
-#include "Jeu/Jeu.hpp"
+#include "Jeu.hpp"
 #include <iostream>
 #include <exception>
 
-/**
- * @brief Point d'entrée principal de Hero Realms
- * @author Issam92-prog
- * @date 2025-10-29
- */
+
 int main() {
     try {
         std::cout << "\n╔════════════════════════════════════════════════════════╗" << std::endl;
