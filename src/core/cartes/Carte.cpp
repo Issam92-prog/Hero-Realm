@@ -59,6 +59,7 @@ void Carte::afficher() const {
     switch(type) {
         case ACTION: std::cout << "Action"; break;
         case CHAMPION: std::cout << "Champion"; break;
+        case ITEM: std::cout << "Item"; break;
     }
     
     std::cout << std::endl;
