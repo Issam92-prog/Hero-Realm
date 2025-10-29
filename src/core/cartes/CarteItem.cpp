@@ -6,7 +6,7 @@ CarteItem::CarteItem(int quantity, const std::string& nom, int cout, Faction fac
                      int or_val, int combat_val)
     : Carte(quantity, nom, cout, faction, ITEM),
       or_genere(or_val), combat_genere(combat_val),
-      sacrifice_or(0), sacrifice_combat(0), sacrifice_sante(0), sacrifice_pioche(0) {
+      sacrifice_or(0), sacrifice_combat(0) {
 }
 
 CarteItem::~CarteItem() {
@@ -17,21 +17,20 @@ void CarteItem::setEffets(int or_val, int combat_val) {
     combat_genere = combat_val;
 }
 
-void CarteItem::setEffetSacrifice(int or_val, int combat_val, int sante_val, int pioche_val) {
+void CarteItem::setEffetSacrifice(int or_val, int combat_val) {
     sacrifice_or = or_val;
     sacrifice_combat = combat_val;
-    sacrifice_sante = sante_val;
-    sacrifice_pioche = pioche_val;
 }
 
 void CarteItem::jouer(Joueur* joueur) {
-    (void)joueur;
     std::cout << "Joue l'item: " << nom << std::endl;
     
     if (or_genere > 0) {
+        joueur->ajouterOr(or_genere);
         std::cout << "  + " << or_genere << " or" << std::endl;
     }
     if (combat_genere > 0) {
+        joueur->ajouterCombat(combat_genere);
         std::cout << "  + " << combat_genere << " combat" << std::endl;
     }
 }
@@ -45,6 +44,38 @@ void CarteItem::afficher() const {
     }
     if (combat_genere > 0) {
         std::cout << "  Combat: +" << combat_genere << std::endl;
+    }
+    
+    if (aEffetSacrifice()) {
+        std::cout << "\nEffet sacrifice:" << std::endl;
+        if (sacrifice_or > 0) {
+            std::cout << "  Or: +" << sacrifice_or << std::endl;
+        }
+        if (sacrifice_combat > 0) {
+            std::cout << "  Combat: +" << sacrifice_combat << std::endl;
+        }
+    }
+}
+
+bool CarteItem::aEffetSacrifice() const {
+    return (sacrifice_or > 0 || sacrifice_combat > 0);
+}
+
+void CarteItem::sacrifier(Joueur* joueur) {
+    if (!aEffetSacrifice()) {
+        std::cout << "Cet item n'a pas d'effet de sacrifice." << std::endl;
+        return;
+    }
+    
+    std::cout << "Sacrifice " << nom << std::endl;
+    
+    if (sacrifice_or > 0) {
+        joueur->ajouterOr(sacrifice_or);
+        std::cout << "  + " << sacrifice_or << " or" << std::endl;
+    }
+    if (sacrifice_combat > 0) {
+        joueur->ajouterCombat(sacrifice_combat);
+        std::cout << "  + " << sacrifice_combat << " combat" << std::endl;
     }
 }
 
@@ -62,12 +93,4 @@ int CarteItem::getSacrificeOr() const {
 
 int CarteItem::getSacrificeCombat() const {
     return sacrifice_combat;
-}
-
-int CarteItem::getSacrificeSante() const {
-    return sacrifice_sante;
-}
-
-int CarteItem::getSacrificePioche() const {
-    return sacrifice_pioche;
 }

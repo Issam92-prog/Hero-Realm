@@ -8,11 +8,10 @@ protected:
     // Effets principaux (quand l'item est joué)
     int or_genere;
     int combat_genere;
-    // Effets de sacrifice
+    
+    // Effets de sacrifice (seulement or et combat)
     int sacrifice_or;
     int sacrifice_combat;
-    int sacrifice_sante;
-    int sacrifice_pioche;
 
 public:
     CarteItem(int quantity, const std::string& nom, int cout, Faction faction, 
@@ -22,7 +21,7 @@ public:
     
     // Setters pour les effets
     void setEffets(int or_val, int combat_val);
-    void setEffetSacrifice(int or_val, int combat_val, int sante_val = 0, int pioche_val = 0);
+    void setEffetSacrifice(int or_val, int combat_val);
     
     // Override de Carte
     void jouer(Joueur* joueur) override;
@@ -37,8 +36,6 @@ public:
     bool aEffetSacrifice() const;
     int getSacrificeOr() const;
     int getSacrificeCombat() const;
-    int getSacrificeSante() const;
-    int getSacrificePioche() const;
 };
 
 #endif
