@@ -1,10 +1,14 @@
-#include <iostream>
-using namespace std;
+#ifndef FACTION_HPP
+#define FACTION_HPP
 
-enum faction {
+#include <iostream>
+
+enum Faction {
     IMPERIAL,
     GUILD,
     NECROS,
     WILD,
     NONE
 };
+
+#endif

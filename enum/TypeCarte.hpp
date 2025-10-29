@@ -1,8 +1,12 @@
+#ifndef TYPECARTE_HPP
+#define TYPECARTE_HPP
+
 #include <iostream>
-using namespace std;
 
 enum TypeCarte {
     CHAMPION,
     ACTION,
-    ITEM,
+    ITEM
 };
+
+#endif

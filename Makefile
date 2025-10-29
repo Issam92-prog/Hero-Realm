@@ -1,6 +1,6 @@
 CXX = g++
 CXXFLAGS = -std=c++17 -Wall -Wextra -O2
-CPPFLAGS = -Iinclude
+CPPFLAGS = -Iinclude -I.
 
 SRC_DIR = src
 OBJ_DIR = build

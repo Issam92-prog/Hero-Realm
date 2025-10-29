@@ -1,4 +1,4 @@
-#include "Carte.hpp"
+#include "cartes/Carte.hpp"
 #include <iostream>
 
 Carte::Carte(int quantity, const std::string& nom, int cout, Faction faction, TypeCarte type)

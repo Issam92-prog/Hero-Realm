@@ -1,5 +1,5 @@
-#include "CarteChampion.hpp"
-#include "Joueur.hpp"
+#include "cartes/CarteChampion.hpp"
+#include "Joueur/Joueur.hpp"
 #include <iostream>
 
 CarteChampion::CarteChampion(int quantity, const std::string& nom, int cout, 
@@ -36,6 +36,7 @@ void CarteChampion::setEffetAllie(int or_val, int combat_val, int soin_val, int 
 }
 
 void CarteChampion::jouer(Joueur* joueur) {
+    (void)joueur; // Pour éviter le warning "unused parameter"
     std::cout << "Pose le champion: " << nom << " (Défense: " << defense << ")";
     if (est_garde) {
         std::cout << " [GARDE]";
