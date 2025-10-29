@@ -1,9 +1,14 @@
 #pragma once
 #include <string>
 #include <cstdint>
-#include <vector>
+#include "zone/Pioche.hpp"
+#include "zone/MainJoueur.hpp"
+#include "zone/ZoneDeJeu.hpp"
+#include "zone/Defausse.hpp"
+#include "zone/Sacrifice.hpp"
 
 class Carte;
+class CarteChampion;
 
 class Joueur {
 public:
@@ -34,19 +39,38 @@ public:
     void debutDeTour();
     void finDeTour();
 
-    // Pioche / main / défausse
+    // Pioche
     void piocher(int n = 1);
     void initialiserDeckDeBase();
 
-    // Accesseurs non-const (pour modifier)
-    std::vector<Carte*>& main();
-    std::vector<Carte*>& deck();
-    std::vector<Carte*>& defausse();
+    // Gestion des champions
+    void jouerChampion(CarteChampion* champion);
+    void preparerChampions();
+    void defausserChampionsMorts();
+    bool aChampionsGarde() const;
 
-    // Accesseurs const (pour lecture seule)
-    const std::vector<Carte*>& main() const;
-    const std::vector<Carte*>& deck() const;
-    const std::vector<Carte*>& defausse() const;
+    // Gestion du sacrifice
+    void sacrifierCarte(Carte* carte);
+
+    // Affichage
+    void afficherZones() const;
+    void afficherMain() const;
+    void afficherChampions() const;
+    void afficherStatistiques() const;
+
+    // Accesseurs des zones (non-const)
+    Pioche& pioche();
+    MainJoueur& main();
+    ZoneDeJeu& zoneDeJeu();
+    Defausse& defausse();
+    Sacrifice& sacrifice();
+
+    // Accesseurs des zones (const)
+    const Pioche& pioche() const;
+    const MainJoueur& main() const;
+    const ZoneDeJeu& zoneDeJeu() const;
+    const Defausse& defausse() const;
+    const Sacrifice& sacrifice() const;
 
 private:
     Id          id_;
@@ -56,7 +80,10 @@ private:
     int or_tour_{0};
     int combat_tour_{0};
 
-    std::vector<Carte*> main_;
-    std::vector<Carte*> deck_;
-    std::vector<Carte*> defausse_;
+    // ===== ZONES DU JOUEUR =====
+    Pioche pioche_;           // Cartes à piocher
+    MainJoueur main_;         // Cartes en main
+    ZoneDeJeu zone_de_jeu_;   // Champions actifs
+    Defausse defausse_;       // Cartes défaussées (remélangent)
+    Sacrifice sacrifice_;     // Cartes sacrifiées (ne remélangent PAS)
 };
