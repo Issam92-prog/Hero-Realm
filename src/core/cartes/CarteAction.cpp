@@ -1,5 +1,5 @@
-#include "CarteAction.hpp"
-#include "Joueur.hpp"
+#include "cartes/CarteAction.hpp"
+#include "Joueur/Joueur.hpp"
 #include <iostream>
 
 CarteAction::CarteAction(int quantity, const std::string& nom, int cout, Faction faction)
@@ -36,6 +36,7 @@ void CarteAction::setEffetSacrifice(int or_val, int combat_val, int soin_val, in
 }
 
 void CarteAction::jouer(Joueur* joueur) {
+    (void)joueur; // Pour éviter le warning "unused parameter"
     // TODO: Implémenter la logique de jeu
     std::cout << "Joue la carte action: " << nom << std::endl;
     

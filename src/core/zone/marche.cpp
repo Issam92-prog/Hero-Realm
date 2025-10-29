@@ -1,4 +1,6 @@
 #include "zone/marche.hpp"
+#include "cartes/CarteItem.hpp"
+#include "enum/Faction.hpp"
 #include <iostream>
 #include <algorithm>
 #include <random>
@@ -12,8 +14,8 @@ void Marche::initialiser() {
     // Créer les cartes du marché
     // Cartes basiques : Épée (2 combat, coût 2), Bourse (2 or, coût 3)
     for (int i = 0; i < 4; ++i) {
-        deck_marche_.push_back(new Carte("Épée", 0, 2, 2));
-        deck_marche_.push_back(new Carte("Bourse", 2, 0, 3));
+        deck_marche_.push_back(new CarteItem(1, "Épée", 2, Faction::NONE, 0, 2));
+        deck_marche_.push_back(new CarteItem(1, "Bourse", 3, Faction::NONE, 2, 0));
     }
     
     // Mélanger le deck

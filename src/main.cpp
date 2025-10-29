@@ -3,7 +3,7 @@
 #include <iomanip>
 #include "Plateau.hpp"
 #include "Joueur/Joueur.hpp"
-#include "cartes/cartes.hpp"
+#include "cartes/Carte.hpp"
 #include "zone/marche.hpp"
 
 using namespace std;
@@ -13,7 +13,8 @@ void afficherMain(const Joueur* j) {
     cout << "\nMain de " << j->nom() << ":\n";
     const auto& main = j->main();
     for (size_t i = 0; i < main.size(); ++i) {
-        cout << "[" << i + 1 << "] " << *main[i] << "\n";
+        cout << "[" << i + 1 << "] ";
+        main[i]->afficher();
     }
     cout << "\n";
 }
@@ -61,11 +62,13 @@ int main() {
             auto& marche = p.marche();
             if (index >= 0 && (size_t)index < marche.nbCartes()) {
                 Carte* carte = marche.cartesDisponibles()[index];
-                if (j->orTour() >= carte->cout()) {
-                    j->ajouterOr(-carte->cout());  // Payer le coût
+                if (j->orTour() >= carte->getCout()) {
+                    j->ajouterOr(-carte->getCout());  // Payer le coût
                     carte = marche.acheterCarte(index);
                     j->defausse().push_back(carte);
-                    cout << "Acheté " << *carte << " (Or restant: " << j->orTour() << ")\n";
+                    cout << "Acheté ";
+                    carte->afficher();
+                    cout << " (Or restant: " << j->orTour() << ")\n";
                 } else {
                     cout << "Pas assez d'or pour acheter cette carte!\n";
                 }
@@ -81,7 +84,8 @@ int main() {
             auto& main = j->main();
             if (index >= 0 && (size_t)index < main.size()) {
                 Carte* carte = main[index];
-                cout << "\nJoue " << *carte;
+                cout << "\nJoue ";
+                carte->afficher();
                 carte->jouer(j);
                 main.erase(main.begin() + index);
                 

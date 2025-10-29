@@ -4,6 +4,7 @@
 #include "Carte.hpp"
 #include "CarteAction.hpp"
 #include "CarteChampion.hpp"
+#include "CarteItem.hpp"
 #include <vector>
 
 class CarteDB {

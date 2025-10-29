@@ -1,4 +1,4 @@
-#include "CarteDB.hpp"
+#include "cartes/CarteDB.hpp"
 
 std::vector<Carte*> CarteDB::getStartingCards() {
     std::vector<Carte*> cards;

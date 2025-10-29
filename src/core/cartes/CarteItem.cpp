@@ -1,5 +1,5 @@
-#include "CarteItem.hpp"
-#include "Joueur.hpp"
+#include "cartes/CarteItem.hpp"
+#include "Joueur/Joueur.hpp"
 #include <iostream>
 
 CarteItem::CarteItem(int quantity, const std::string& nom, int cout, Faction faction, 
@@ -25,6 +25,7 @@ void CarteItem::setEffetSacrifice(int or_val, int combat_val, int sante_val, int
 }
 
 void CarteItem::jouer(Joueur* joueur) {
+    (void)joueur;
     std::cout << "Joue l'item: " << nom << std::endl;
     
     if (or_genere > 0) {

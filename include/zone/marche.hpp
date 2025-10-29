@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
 #include <memory>
-#include "cartes/cartes.hpp"
+#include "cartes/Carte.hpp"
 
 class Marche {
 public:

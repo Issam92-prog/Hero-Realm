@@ -1,5 +1,7 @@
 #include "Joueur/Joueur.hpp"
-#include "cartes/cartes.hpp"
+#include "cartes/Carte.hpp"
+#include "cartes/CarteItem.hpp"
+#include "enum/Faction.hpp"
 #include <algorithm>
 #include <random>
 
@@ -70,8 +72,8 @@ void Joueur::piocher(int n) {
 
 void Joueur::initialiserDeckDeBase() {
     // Création d'un deck de base : 7 Or (1 or), 3 Dague (1 combat)
-    for (int i = 0; i < 7; ++i) deck_.push_back(new Carte("Or", 1, 0));
-    for (int i = 0; i < 3; ++i) deck_.push_back(new Carte("Dague", 0, 1));
+    for (int i = 0; i < 7; ++i) deck_.push_back(new CarteItem(1, "Or", 0, Faction::NONE, 1, 0));
+    for (int i = 0; i < 3; ++i) deck_.push_back(new CarteItem(1, "Dague", 0, Faction::NONE, 0, 1));
 
     std::shuffle(deck_.begin(), deck_.end(), rng());
     piocher(5);
