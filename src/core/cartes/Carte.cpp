@@ -40,6 +40,28 @@ void Carte::setDescription(const std::string& desc) {
     description = desc;
 }
 
+std::string Carte::getFactionIcon() const {
+    switch(faction) {
+        case Faction::IMPERIAL: return "🛡️";
+        case Faction::GUILD:    return "🏹";
+        case Faction::NECROS:   return "💀";
+        case Faction::WILD:     return "🐺";
+        case Faction::NONE:     return "⚪";
+        default:                return "❓";
+    }
+}
+
+std::string Carte::getFactionNom() const {
+    switch(faction) {
+        case Faction::IMPERIAL: return "IMPERIAL";
+        case Faction::GUILD:    return "GUILD";
+        case Faction::NECROS:   return "NECROS";
+        case Faction::WILD:     return "WILD";
+        case Faction::NONE:     return "NONE";
+        default:                return "INCONNU";
+    }
+}
+
 void Carte::afficher() const {
     std::cout << "=== " << nom << " ===" << std::endl;
     std::cout << "Coût: " << cout << std::endl;

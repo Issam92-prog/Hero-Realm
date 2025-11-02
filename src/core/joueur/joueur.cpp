@@ -78,6 +78,7 @@ void Joueur::debutDeTour() {
     std::cout << "╚════════════════════════════════════╝" << std::endl;
     
     resetRessources();
+    reinitialiserFactionsJouees();  // important pour les effets alliés
     preparerChampions();
 }
 
@@ -173,9 +174,6 @@ void Joueur::sacrifierCarte(Carte* carte) {
         return;
     }
     
-    // TODO: Appliquer l'effet de sacrifice ici
-    // (sera implémenté quand jouer() sera terminé)
-    
     // Mettre la carte dans la zone sacrifice (retirée définitivement)
     sacrifice_.ajouterCarte(carte);
 }
@@ -254,3 +252,22 @@ const MainJoueur& Joueur::main() const { return main_; }
 const ZoneDeJeu& Joueur::zoneDeJeu() const { return zone_de_jeu_; }
 const Defausse& Joueur::defausse() const { return defausse_; }
 const Sacrifice& Joueur::sacrifice() const { return sacrifice_; }
+
+// ====== GESTION DES EFFETS ALLIÉS ======
+
+bool Joueur::aJoueFaction(Faction faction) const {
+    for (const auto& f : factions_jouees_ce_tour_) {
+        if (f == faction) {
+            return true;
+        }
+    }
+    return false;
+}
+
+void Joueur::enregistrerFactionJouee(Faction faction) {
+    factions_jouees_ce_tour_.push_back(faction);
+}
+
+void Joueur::reinitialiserFactionsJouees() {
+    factions_jouees_ce_tour_.clear();
+}

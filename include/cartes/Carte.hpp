@@ -37,6 +37,18 @@ public:
 
     // Affichage
     virtual void afficher() const;
+
+    /**
+     * @brief Récupère l'icône de la faction
+     * @return std::string L'icône (emoji)
+     */
+    std::string getFactionIcon() const;
+
+    /**
+     * @brief Récupère le nom de la faction
+     * @return std::string Le nom complet
+     */
+    std::string getFactionNom() const;
 };
 
 #endif

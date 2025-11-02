@@ -1,71 +1,96 @@
-#pragma once
-#include <string>
+#ifndef JOUEUR_HPP
+#define JOUEUR_HPP
+
 #include <cstdint>
+#include <string>
+#include <vector>
 #include "zone/Pioche.hpp"
 #include "zone/MainJoueur.hpp"
 #include "zone/ZoneDeJeu.hpp"
 #include "zone/Defausse.hpp"
 #include "zone/Sacrifice.hpp"
+#include "enum/Faction.hpp"
+#include "cartes/Carte.hpp"
+#include "cartes/CarteChampion.hpp"
 
-class Carte;
-class CarteChampion;
 
 class Joueur {
 public:
     using Id = std::uint32_t;
 
-    // Ctor/Dtor
+    // ====== Constructeur & Destructeur ======
     Joueur(Id id, const std::string& nom, int pv_initial = 50);
     ~Joueur();
 
-    // Identité
+    // ====== Identité ======
     Id id() const;
     const std::string& nom() const;
 
-    // Points de vie
-    int  pv() const;
-    void soigner(int v);
-    void subirDegats(int v);
+    // ====== Points de Vie ======
+    int pv() const;
+    void soigner(int valeur);
+    void subirDegats(int valeur);
     bool estMort() const;
 
-    // Ressources du tour
-    int  orTour() const;
-    int  combatTour() const;
+    // ====== Ressources (Or & Combat) ======
+    int orTour() const;
+    int combatTour() const;
     void ajouterOr(int n);
     void ajouterCombat(int n);
     void resetRessources();
 
-    // Cycle de tour
+    // ====== Cycle de Jeu ======
     void debutDeTour();
     void finDeTour();
 
-    // Pioche
+    // ====== Pioche ======
     void piocher(int n = 1);
     void initialiserDeckDeBase();
 
-    // Gestion des champions
+    // ====== Gestion des Champions ======
     void jouerChampion(CarteChampion* champion);
     void preparerChampions();
     void defausserChampionsMorts();
     bool aChampionsGarde() const;
 
-    // Gestion du sacrifice
+    // ====== Gestion du Sacrifice ======
     void sacrifierCarte(Carte* carte);
 
-    // Affichage
+    // ════════════════════════════════════════════════════════
+    // ====== GESTION DES EFFETS ALLIÉS (NOUVEAU) ======
+    // ════════════════════════════════════════════════════════
+
+    /**
+     * @brief Vérifie si le joueur a joué une carte de la faction donnée ce tour
+     * @param faction La faction à vérifier
+     * @return bool true si une carte de cette faction a été jouée
+     */
+    bool aJoueFaction(Faction faction) const;
+
+    /**
+     * @brief Enregistre qu'une carte d'une faction a été jouée
+     * @param faction La faction jouée
+     */
+    void enregistrerFactionJouee(Faction faction);
+
+    /**
+     * @brief Réinitialise le suivi des factions jouées (début de tour)
+     */
+    void reinitialiserFactionsJouees();
+
+    // ====== Affichage ======
     void afficherZones() const;
     void afficherMain() const;
     void afficherChampions() const;
     void afficherStatistiques() const;
 
-    // Accesseurs des zones (non-const)
+    // ====== Accesseurs des Zones ======
     Pioche& pioche();
     MainJoueur& main();
     ZoneDeJeu& zoneDeJeu();
     Defausse& defausse();
     Sacrifice& sacrifice();
 
-    // Accesseurs des zones (const)
     const Pioche& pioche() const;
     const MainJoueur& main() const;
     const ZoneDeJeu& zoneDeJeu() const;
@@ -73,17 +98,26 @@ public:
     const Sacrifice& sacrifice() const;
 
 private:
-    Id          id_;
+    // Identité
+    Id id_;
     std::string nom_;
-    int         pv_;
 
-    int or_tour_{0};
-    int combat_tour_{0};
+    // État
+    int pv_;
+    int or_tour_ = 0;
+    int combat_tour_ = 0;
 
-    // ===== ZONES DU JOUEUR =====
-    Pioche pioche_;           // Cartes à piocher
-    MainJoueur main_;         // Cartes en main
-    ZoneDeJeu zone_de_jeu_;   // Champions actifs
-    Defausse defausse_;       // Cartes défaussées (remélangent)
-    Sacrifice sacrifice_;     // Cartes sacrifiées (ne remélangent PAS)
+    // Zones
+    Pioche pioche_;
+    MainJoueur main_;
+    ZoneDeJeu zone_de_jeu_;
+    Defausse defausse_;
+    Sacrifice sacrifice_;
+
+    // ════════════════════════════════════════════════════════
+    // Suivi des factions jouées ce tour (pour effets alliés)
+    // ════════════════════════════════════════════════════════
+    std::vector<Faction> factions_jouees_ce_tour_;
 };
+
+#endif // JOUEUR_HPP
