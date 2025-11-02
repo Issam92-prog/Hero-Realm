@@ -15,13 +15,13 @@ void Regle::afficherSeparateur() {
 
 void Regle::afficherTitre(const std::string& titre) {
     std::cout << "╔════════════════════════════════════════════════════════╗" << std::endl;
-    std::cout << "║  " << titre;
+    std::cout << "║                                                        ║" << std::endl;
     // Calculer les espaces pour centrer
     int espaces = 54 - titre.length();
     for (int i = 0; i < espaces; ++i) {
         std::cout << " ";
     }
-    std::cout << "║" << std::endl;
+    std::cout << "║                                                        ║" << std::endl;
     std::cout << "╚════════════════════════════════════════════════════════╝" << std::endl;
 }
 
