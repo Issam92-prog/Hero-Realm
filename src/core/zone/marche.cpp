@@ -1,6 +1,8 @@
 #include "zone/Marche.hpp"
 #include "cartes/Carte.hpp"
 #include "cartes/CarteItem.hpp"
+#include "cartes/CarteAction.hpp"
+#include "cartes/CarteChampion.hpp"
 #include "cartes/CarteDB.hpp"
 #include "enum/Faction.hpp"
 #include "enum/TypeCarte.hpp"
@@ -10,7 +12,7 @@
 
 // ====== Constructeur & Destructeur ======
 
-Marche::Marche() : gemme_de_feu_template_(nullptr), rng_(std::random_device{}()) {
+Marche::Marche() : rng_(std::random_device{}()) {
 }
 
 Marche::~Marche() {
@@ -25,20 +27,15 @@ void Marche::initialiser() {
     // Nettoyer si déjà initialisé
     nettoyer();
 
-    // Créer le template de Gemme de Feu
-    creerGemmeDeFeu();
+    // Charger et décompresser les Gemmes de Feu depuis CarteDB
+    auto gemmes_templates = CarteDB::getFireGems();
+    decompresserCartes(gemmes_templates, gemmes_de_feu_);
+    
+    std::cout << "   🔥 " << gemmes_de_feu_.size() << " Gemmes de Feu chargées" << std::endl;
 
-    // Charger toutes les cartes du marché depuis CarteDB
-    auto imperial = CarteDB::getImperialCards();
-    auto guild = CarteDB::getGuildCards();
-    auto necros = CarteDB::getNecrosCards();
-    auto wild = CarteDB::getWildCards();
-
-    // Fusionner toutes les cartes dans le deck
-    deck_marche_.insert(deck_marche_.end(), imperial.begin(), imperial.end());
-    deck_marche_.insert(deck_marche_.end(), guild.begin(), guild.end());
-    deck_marche_.insert(deck_marche_.end(), necros.begin(), necros.end());
-    deck_marche_.insert(deck_marche_.end(), wild.begin(), wild.end());
+    // Charger toutes les cartes du marché depuis CarteDB (méthode unique)
+    auto market_templates = CarteDB::getAllMarketCards();
+    decompresserCartes(market_templates, deck_marche_);
 
     std::cout << "   📦 " << deck_marche_.size() << " cartes chargées" << std::endl;
 
@@ -49,6 +46,135 @@ void Marche::initialiser() {
     remplirMarche();
 
     std::cout << "✅ Marché initialisé !" << std::endl;
+}
+
+void Marche::decompresserCartes(std::vector<Carte*>& templates, std::vector<Carte*>& destination) {
+    for (auto* template_carte : templates) {
+        int quantite = template_carte->getQuantity();
+        
+        // Créer autant de copies que la quantité indique
+        for (int i = 0; i < quantite; i++) {
+            Carte* copie = clonerCarte(template_carte);
+            if (copie) {
+                destination.push_back(copie);
+            }
+        }
+        
+        // Libérer le template original
+        delete template_carte;
+    }
+    templates.clear();
+}
+
+Carte* Marche::clonerCarte(const Carte* carte) {
+    if (!carte) return nullptr;
+
+    // Déterminer le type de carte et créer une copie
+    if (const CarteItem* item = dynamic_cast<const CarteItem*>(carte)) {
+        CarteItem* copie = new CarteItem(
+            1,  // Quantité toujours 1 pour les instances individuelles
+            item->getNom(),
+            item->getCout(),
+            item->getFaction(),
+            item->getOr(),
+            item->getCombat()
+        );
+        copie->setDescription(item->getDescription());
+        
+        // Copier les effets de sacrifice si présents
+        if (item->getSacrificeOr() > 0 || item->getSacrificeCombat() > 0) {
+            copie->setEffetSacrifice(
+                item->getSacrificeOr(),
+                item->getSacrificeCombat()
+            );
+        }
+        
+        return copie;
+    }
+    else if (const CarteAction* action = dynamic_cast<const CarteAction*>(carte)) {
+        CarteAction* copie = new CarteAction(
+            1,
+            action->getNom(),
+            action->getCout(),
+            action->getFaction()
+        );
+        copie->setDescription(action->getDescription());
+        
+        // Copier l'effet principal
+        copie->setEffetPrincipal(
+            action->getOrPrincipal(),
+            action->getCombatPrincipal(),
+            action->getSoinPrincipal(),
+            action->getPiochePrincipal()
+        );
+        
+        // Copier l'effet allié si présent
+        if (action->aEffetAllie()) {
+            copie->setEffetAllie(
+                action->getOrAllie(),
+                action->getCombatAllie(),
+                action->getSoinAllie(),
+                action->getPiocheAllie()
+            );
+        }
+        
+        // Copier l'effet sacrifice si présent
+        if (action->aEffetSacrifice()) {
+            copie->setEffetSacrifice(
+                action->getOrSacrifice(),
+                action->getCombatSacrifice(),
+                action->getSoinSacrifice(),
+                action->getPiocheSacrifice()
+            );
+        }
+        
+        return copie;
+    }
+    else if (const CarteChampion* champion = dynamic_cast<const CarteChampion*>(carte)) {
+        CarteChampion* copie = new CarteChampion(
+            1,
+            champion->getNom(),
+            champion->getCout(),
+            champion->getFaction(),
+            champion->getDefense(),
+            champion->estGarde()
+        );
+        copie->setDescription(champion->getDescription());
+        
+        // Copier l'effet principal si présent
+        if (champion->aEffetPrincipal()) {
+            copie->setEffetPrincipal(
+                champion->getOrPrincipal(),
+                champion->getCombatPrincipal(),
+                champion->getSoinPrincipal(),
+                champion->getPiochePrincipal()
+            );
+        }
+        
+        // Copier l'effet Expend si présent
+        if (champion->aEffetExpend()) {
+            copie->setEffetExpend(
+                champion->getOrExpend(),
+                champion->getCombatExpend(),
+                champion->getSoinExpend(),
+                champion->getPiocheExpend()
+            );
+        }
+        
+        // Copier l'effet allié si présent
+        if (champion->aEffetAllie()) {
+            copie->setEffetAllie(
+                champion->getOrAllie(),
+                champion->getCombatAllie(),
+                champion->getSoinAllie(),
+                champion->getPiocheAllie()
+            );
+        }
+        
+        return copie;
+    }
+    
+    return nullptr;
 }
 
 void Marche::nettoyer() {
@@ -70,17 +196,11 @@ void Marche::nettoyer() {
     }
     defausse_marche_.clear();
 
-    // Supprimer le template de gemme
-    if (gemme_de_feu_template_) {
-        delete gemme_de_feu_template_;
-        gemme_de_feu_template_ = nullptr;
+    // Supprimer les gemmes de feu
+    for (auto* gemme : gemmes_de_feu_) {
+        delete gemme;
     }
-}
-
-void Marche::creerGemmeDeFeu() {
-    gemme_de_feu_template_ = new CarteItem(1, "Gemme de Feu", 2, Faction::NONE, 2, 0);
-    gemme_de_feu_template_->setDescription("Gain 2 gold\nSacrifice: Gain 3 combat");
-    gemme_de_feu_template_->setEffetSacrifice(0, 3);
+    gemmes_de_feu_.clear();
 }
 
 // ====== Achat de Cartes ======
@@ -104,17 +224,16 @@ Carte* Marche::acheterCarte(size_t index) {
 }
 
 Carte* Marche::acheterGemmeDeFeu() {
-    if (!gemme_de_feu_template_) {
-        std::cout << "⚠️  Gemme de Feu non disponible !" << std::endl;
+    if (gemmes_de_feu_.empty()) {
+        std::cout << "⚠️  Plus de Gemmes de Feu disponibles !" << std::endl;
         return nullptr;
     }
 
-    // Créer une nouvelle instance (pile infinie)
-    CarteItem* gemme = new CarteItem(1, "Gemme de Feu", 2, Faction::NONE, 2, 0);
-    gemme->setDescription("Gain 2 gold\nSacrifice: Gain 3 combat");
-    gemme->setEffetSacrifice(0, 3);
+    // Retirer une gemme de la pile
+    Carte* gemme = gemmes_de_feu_.back();
+    gemmes_de_feu_.pop_back();
 
-    std::cout << "🛒 Gemme de Feu achetée" << std::endl;
+    std::cout << "🛒 Gemme de Feu achetée (" << gemmes_de_feu_.size() << " restantes)" << std::endl;
 
     return gemme;
 }
@@ -163,9 +282,13 @@ void Marche::afficher(bool afficher_details) const {
     std::cout << "║              🏪 MARCHÉ - Hero Realms                   ║" << std::endl;
     std::cout << "╚════════════════════════════════════════════════════════╝" << std::endl;
 
-    // Gemme de Feu (toujours disponible)
-    std::cout << "\n[🔥] Gemme de Feu (Coût: 2 or) - ♾️  Toujours disponible" << std::endl;
-    std::cout << "     💰 Gain 2 or | 💀 Sacrifice: Gain 3 combat" << std::endl;
+    // Afficher le nombre de Gemmes de Feu restantes
+    std::cout << "\n[🔥] Gemme de Feu (Coût: 2 or) - 📦 " << gemmes_de_feu_.size() << " restantes" << std::endl;
+    if (gemmes_de_feu_.empty()) {
+        std::cout << "     ⚠️  ÉPUISÉES !" << std::endl;
+    } else {
+        std::cout << "     💰 Gain 2 or | 💀 Sacrifice: Gain 3 combat" << std::endl;
+    }
 
     // Cartes disponibles
     std::cout << "\n--- Cartes Disponibles à l'Achat ---" << std::endl;
@@ -198,6 +321,7 @@ void Marche::afficher(bool afficher_details) const {
 
     // Statistiques
     std::cout << "\n--- Statistiques ---" << std::endl;
+    std::cout << "🔥 Gemmes de Feu: " << gemmes_de_feu_.size() << std::endl;
     std::cout << "📦 Cartes dans le deck: " << deck_marche_.size() << std::endl;
     std::cout << "🗑️  Cartes défaussées: " << defausse_marche_.size() << std::endl;
 }
@@ -215,6 +339,7 @@ void Marche::afficherCarte(size_t index) const {
 
 void Marche::afficherStatistiques() const {
     std::cout << "\n📊 Statistiques du Marché:" << std::endl;
+    std::cout << "   Gemmes de Feu: " << gemmes_de_feu_.size() << std::endl;
     std::cout << "   Cartes disponibles: " << cartes_dispo_.size() << "/5" << std::endl;
     std::cout << "   Cartes dans le deck: " << deck_marche_.size() << std::endl;
     std::cout << "   Cartes défaussées: " << defausse_marche_.size() << std::endl;
@@ -233,7 +358,7 @@ void Marche::afficherStatistiques() const {
         }
 
         std::cout << "\n   Factions disponibles:" << std::endl;
-        if (imperial > 0) std::cout << "   - 🛡️  Imperial: " << imperial << std::endl;
+        if (imperial > 0) std::cout << "   - 👑 Imperial: " << imperial << std::endl;
         if (guild > 0)    std::cout << "   - 🏹 Guild: " << guild << std::endl;
         if (necros > 0)   std::cout << "   - 💀 Necros: " << necros << std::endl;
         if (wild > 0)     std::cout << "   - 🐺 Wild: " << wild << std::endl;
@@ -242,7 +367,7 @@ void Marche::afficherStatistiques() const {
 
 std::string Marche::getIconeFaction(int faction) const {
     switch(faction) {
-        case static_cast<int>(Faction::IMPERIAL): return "🛡️";
+        case static_cast<int>(Faction::IMPERIAL): return "👑";
         case static_cast<int>(Faction::GUILD):    return "🏹";
         case static_cast<int>(Faction::NECROS):   return "💀";
         case static_cast<int>(Faction::WILD):     return "🐺";
@@ -271,6 +396,10 @@ size_t Marche::nbCartesDeck() const {
 
 size_t Marche::nbCartesDefaussees() const {
     return defausse_marche_.size();
+}
+
+size_t Marche::nbGemmesDeFeu() const {
+    return gemmes_de_feu_.size();
 }
 
 bool Marche::deckVide() const {

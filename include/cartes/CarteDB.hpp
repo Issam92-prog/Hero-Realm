@@ -10,7 +10,6 @@
 class CarteDB {
 public:
     // Retourne des pointeurs vers les cartes
-    static std::vector<Carte*> getStartingCards();
     static std::vector<Carte*> getFireGems();
     static std::vector<Carte*> getImperialCards();
     static std::vector<Carte*> getGuildCards();
@@ -18,7 +17,6 @@ public:
     static std::vector<Carte*> getWildCards();
     static std::vector<Carte*> getAllMarketCards();
     
-    static int getTotalCardCount();
     
     // Méthode pour libérer la mémoire
     static void deleteCards(std::vector<Carte*>& cards);

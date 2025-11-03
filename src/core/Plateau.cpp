@@ -33,7 +33,6 @@ void Plateau::initialiser(const std::vector<std::string>& noms_joueurs, int pv_i
     }
 
     // Initialiser le marché
-    std::cout << "\n🏪 Initialisation du marché..." << std::endl;
     marche_.initialiser();
 
     std::cout << "\n✅ Plateau initialisé avec " << joueurs_.size() << " joueur(s)" << std::endl;

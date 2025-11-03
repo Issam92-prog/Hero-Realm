@@ -136,7 +136,7 @@ void MainJoueur::afficherCarte(size_t index) const {
 
 std::string MainJoueur::getIconeFaction(int faction) const {
     switch(faction) {
-        case static_cast<int>(Faction::IMPERIAL): return "🛡️";
+        case static_cast<int>(Faction::IMPERIAL): return "👑";
         case static_cast<int>(Faction::GUILD):    return "🏹";
         case static_cast<int>(Faction::NECROS):   return "💀";
         case static_cast<int>(Faction::WILD):     return "🐺";

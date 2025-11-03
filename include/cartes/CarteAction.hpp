@@ -53,6 +53,16 @@ public:
     int getCombatPrincipal() const;
     int getSoinPrincipal() const;
     int getPiochePrincipal() const;
+    
+    int getOrAllie() const;
+    int getCombatAllie() const;
+    int getSoinAllie() const;
+    int getPiocheAllie() const;
+    
+    int getOrSacrifice() const;
+    int getCombatSacrifice() const;
+    int getSoinSacrifice() const;
+    int getPiocheSacrifice() const;
 };
 
 #endif

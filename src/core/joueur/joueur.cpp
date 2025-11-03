@@ -1,7 +1,7 @@
 #include "Joueur/Joueur.hpp"
 #include "cartes/Carte.hpp"
 #include "cartes/CarteItem.hpp"
-#include "cartes/cartechampion.hpp"
+#include "cartes/CarteChampion.hpp"
 #include "enum/Faction.hpp"
 #include <algorithm>
 #include <iostream>
@@ -113,22 +113,33 @@ void Joueur::piocher(int n) {
 void Joueur::initialiserDeckDeBase() {
     std::cout << "🎲 Initialisation du deck de " << nom_ << "..." << std::endl;
     
-    // Création d'un deck de base : 7 Or (1 or), 3 Dague (1 combat)
+    // 7 Or (1 or chacune)
     for (int i = 0; i < 7; ++i) {
         pioche_.cartes().push_back(new CarteItem(1, "Or", 0, Faction::NONE, 1, 0));
     }
-    for (int i = 0; i < 3; ++i) {
-        pioche_.cartes().push_back(new CarteItem(1, "Dague", 0, Faction::NONE, 0, 1));
-    }
+    
+    // 1 Épée courte (2 combat)
+    pioche_.cartes().push_back(new CarteItem(1, "Épée Courte", 0, Faction::NONE, 0, 2));
+    
+    // 1 Dague (1 combat)
+    pioche_.cartes().push_back(new CarteItem(1, "Dague", 0, Faction::NONE, 0, 1));
+    
+    // 1 Rubis (2 or)
+    pioche_.cartes().push_back(new CarteItem(1, "Rubis", 0, Faction::NONE, 2, 0));
 
     pioche_.melanger();
     piocher(5);
     
-    std::cout << "✅ Deck initialisé (7 Or + 3 Dague)" << std::endl;
+    std::cout << "✅ Deck initialisé (7 Or + 1 Épée courte + 1 Dague + 1 Rubis)" << std::endl;
 }
 
 // ====== Gestion des Champions ======
 void Joueur::jouerChampion(CarteChampion* champion) {
+    if (!champion) {
+        std::cout << "⚠️  Champion invalide !" << std::endl;
+        return;
+    }
+    
     // Retirer le champion de la main
     if (!main_.retirerCarte(champion)) {
         std::cout << "⚠️  Champion non trouvé dans la main !" << std::endl;
@@ -139,6 +150,7 @@ void Joueur::jouerChampion(CarteChampion* champion) {
     zone_de_jeu_.ajouterChampion(champion);
     
     // Jouer le champion (effets d'entrée en jeu)
+    // Note: la méthode jouer() du champion gère déjà l'activation des alliés
     champion->jouer(this);
     
     std::cout << "✅ " << champion->getNom() << " entre en jeu !" << std::endl;

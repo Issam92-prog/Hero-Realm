@@ -70,6 +70,12 @@ public:
      */
     void phaseAttaque(Joueur* joueur);
 
+    /**
+     * @brief Phase d'activation des champions : utiliser les capacités Expend
+     * @param joueur Le joueur actif
+     */
+    void phaseChampions(Joueur* joueur);
+
     // Actions de jeu
     /**
      * @brief Joue une carte de la main
@@ -184,6 +190,18 @@ private:
      * @return Joueur* La cible sélectionnée (nullptr si annulé)
      */
     Joueur* selectionnerCible(Joueur* attaquant) const;
+
+    /**
+     * @brief Joue toutes les cartes de la main du joueur
+     * @param joueur Le joueur actif
+     */
+    void jouerToutesLesCartes(Joueur* joueur);
+
+    /**
+     * @brief Permet de quitter la partie en cours avec confirmation
+     * @return true si le joueur confirme vouloir quitter, false sinon
+     */
+    bool quitterPartie();
 };
 
 #endif // JEU_HPP

@@ -42,7 +42,7 @@ void Carte::setDescription(const std::string& desc) {
 
 std::string Carte::getFactionIcon() const {
     switch(faction) {
-        case Faction::IMPERIAL: return "🛡️";
+        case Faction::IMPERIAL: return "👑";
         case Faction::GUILD:    return "🏹";
         case Faction::NECROS:   return "💀";
         case Faction::WILD:     return "🐺";

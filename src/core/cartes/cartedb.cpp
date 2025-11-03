@@ -1,30 +1,5 @@
 #include "cartes/CarteDB.hpp"
 
-std::vector<Carte*> CarteDB::getStartingCards() {
-    std::vector<Carte*> cards;
-    
-    // Or (28 exemplaires, 7 par joueur x 4 joueurs max)
-    CarteItem* or_card = new CarteItem(28, "Or", 0, NONE, 1, 0);
-    or_card->setDescription("Gain 1 gold");
-    cards.push_back(or_card);
-    
-    // Épée Courte (4 exemplaires, 1 par joueur)
-    CarteItem* epee = new CarteItem(4, "Épée Courte", 0, NONE, 0, 2);
-    epee->setDescription("Gain 2 combat");
-    cards.push_back(epee);
-    
-    // Dague (4 exemplaires)
-    CarteItem* dague = new CarteItem(4, "Dague", 0, NONE, 0, 1);
-    dague->setDescription("Gain 1 combat");
-    cards.push_back(dague);
-    
-    // Rubis (4 exemplaires)
-    CarteItem* rubis = new CarteItem(4, "Rubis", 0, NONE, 2, 0);
-    rubis->setDescription("Gain 2 gold");
-    cards.push_back(rubis);
-    
-    return cards;
-}
 
 std::vector<Carte*> CarteDB::getFireGems() {
     std::vector<Carte*> cards;
@@ -429,33 +404,6 @@ std::vector<Carte*> CarteDB::getAllMarketCards() {
     market.insert(market.end(), wild.begin(), wild.end());
     
     return market;
-}
-
-int CarteDB::getTotalCardCount() {
-    int total = 0;
-    
-    // Cartes de départ
-    auto starting = getStartingCards();
-    for (const auto& card : starting) {
-        total += card->getQuantity();
-    }
-    deleteCards(starting);
-    
-    // Fire Gems
-    auto gems = getFireGems();
-    for (const auto& card : gems) {
-        total += card->getQuantity();
-    }
-    deleteCards(gems);
-    
-    // Cartes du marché
-    auto market = getAllMarketCards();
-    for (const auto& card : market) {
-        total += card->getQuantity();
-    }
-    deleteCards(market);
-    
-    return total;
 }
 
 void CarteDB::deleteCards(std::vector<Carte*>& cards) {
