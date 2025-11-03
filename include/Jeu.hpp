@@ -7,6 +7,7 @@
 
 class Joueur;
 class Carte;
+class GodMode;  // ← LIGNE AJOUTÉE
 
 /**
  * @brief Représente le jeu Hero Realms complet
@@ -178,6 +179,8 @@ private:
     int nb_joueurs_;
     std::vector<std::string> noms_joueurs_;
     int pv_initial_;
+    
+    GodMode* god_mode_;  // ← LIGNE AJOUTÉE - Mode triche
 
     /**
      * @brief Affiche l'écran de titre

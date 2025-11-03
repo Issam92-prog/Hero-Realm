@@ -6,6 +6,7 @@
 #include "cartes/CarteAction.hpp"
 #include "cartes/cartechampion.hpp"
 #include "cartes/CarteItem.hpp"
+#include "GodMode.hpp"
 #include <iostream>
 #include <limits>
 #include <algorithm>
@@ -16,12 +17,16 @@ Jeu::Jeu()
     : jeu_en_cours_(false), 
       quitter_(false),
       nb_joueurs_(2),
-      pv_initial_(50) {
+      pv_initial_(50),
+      god_mode_(nullptr) {  
 }
 
 Jeu::~Jeu() {
+    if (god_mode_) {  
+        delete god_mode_;
+        god_mode_ = nullptr;
+    }
 }
-
 // ====== Initialisation ======
 
 void Jeu::lancer() {
@@ -64,6 +69,12 @@ void Jeu::nouvellePartie() {
 
     // Initialiser le plateau
     plateau_.initialiser(noms_joueurs_, pv_initial_);
+
+    // Créer le God Mode (après l'initialisation du plateau)
+    if (god_mode_) {
+        delete god_mode_;
+    }
+    god_mode_ = new GodMode(plateau_);  
 
     // Démarrer la partie
     plateau_.demarrerPartie();
@@ -158,7 +169,7 @@ void Jeu::executerTour(Joueur* joueur) {
         // Menu du tour
         afficherMenuTour();
 
-        int choix = lireEntier(1, 8);  // ← CHANGÉ de 7 à 8
+        int choix = lireEntier(1, 9);  // ← CHANGÉ de 8 à 9
 
         switch (choix) {
             case 1:
@@ -171,7 +182,7 @@ void Jeu::executerTour(Joueur* joueur) {
                 phaseAttaque(joueur);
                 break;
             case 4:
-                phaseChampions(joueur);  // ← NOUVEAU
+                phaseChampions(joueur);
                 break;
             case 5:
                 joueur->afficherStatistiques();
@@ -186,7 +197,15 @@ void Jeu::executerTour(Joueur* joueur) {
                     tour_termine = true;
                 }
                 break;
-            case 8: 
+            case 8:  // ← NOUVEAU : God Mode
+                if (god_mode_) {
+                    god_mode_->afficherMenu();
+                } else {
+                    std::cout << "\n⚠️  God Mode non disponible !" << std::endl;
+                    pause();
+                }
+                break;
+            case 9:  // ← MODIFIÉ : Quitter (était case 8)
                 if (quitterPartie()) {
                     jeu_en_cours_ = false;
                     tour_termine = true;
@@ -704,11 +723,12 @@ void Jeu::afficherMenuTour() const {
     std::cout << "\n  [1] 🎴 Jouer une Carte" << std::endl;
     std::cout << "  [2] 💰 Acheter une Carte" << std::endl;
     std::cout << "  [3] ⚔️  Attaquer" << std::endl;
-    std::cout << "  [4] 👤 Activer les Champions" << std::endl;  // ← NOUVEAU
+    std::cout << "  [4] 👤 Activer les Champions" << std::endl;
     std::cout << "  [5] 📊 Voir Statistiques" << std::endl;
     std::cout << "  [6] ❓ Aide" << std::endl;
     std::cout << "  [7] ✅ Terminer le Tour" << std::endl;
-    std::cout << "  [8] 🚪 Quitter la Partie" << std::endl;  // ← DÉCALÉ
+    std::cout << "  [8] ⚡ God Mode" << std::endl;           
+    std::cout << "  [9] 🚪 Quitter la Partie" << std::endl;  
     std::cout << "\nChoix: ";
 }
 

@@ -428,3 +428,26 @@ const std::vector<Carte*>& Marche::cartesDisponibles() const {
 const Carte* Marche::operator[](size_t index) const {
     return getCarteDisponible(index);
 }
+
+// ════════════════════════════════════════════════════════
+// MÉTHODES GOD MODE
+// ════════════════════════════════════════════════════════
+
+const std::vector<Carte*>& Marche::getDeckCartes() const {
+    return deck_marche_;
+}
+
+Carte* Marche::acheterCarteDuDeck(size_t index) {
+    if (index >= deck_marche_.size()) {
+        std::cout << "⚠️  Index invalide : " << index << std::endl;
+        return nullptr;
+    }
+
+    // Retirer la carte du deck
+    Carte* carte = deck_marche_[index];
+    deck_marche_.erase(deck_marche_.begin() + index);
+
+    std::cout << "⚡ GOD MODE : " << carte->getNom() << " retirée du deck !" << std::endl;
+
+    return carte;
+}

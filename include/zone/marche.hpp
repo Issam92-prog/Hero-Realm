@@ -3,7 +3,7 @@
 
 #include <vector>
 #include <random>
-#include <string>  // ← AJOUT pour std::string
+#include <string>
 
 class Carte;
 class CarteItem;
@@ -202,6 +202,26 @@ public:
      * @return const Carte* La carte (nullptr si index invalide)
      */
     const Carte* operator[](size_t index) const;
+
+    // ════════════════════════════════════════════════════════
+    // MÉTHODES GOD MODE (PUBLIC)
+    // ════════════════════════════════════════════════════════
+    
+    /**
+     * @brief Accède au deck complet du marché (lecture seule) - GOD MODE
+     * @return const std::vector<Carte*>& Référence vers le deck
+     */
+    const std::vector<Carte*>& getDeckCartes() const;
+
+    /**
+     * @brief Achète une carte directement depuis le deck - GOD MODE
+     * @param index Index de la carte dans le deck (0-based)
+     * @return Carte* La carte achetée (nullptr si invalide)
+     * 
+     * Note: Cette méthode ne remplit pas automatiquement le marché.
+     * Elle retire simplement la carte du deck pour le God Mode.
+     */
+    Carte* acheterCarteDuDeck(size_t index);
 
 private:
     // ════════════════════════════════════════════════════════
