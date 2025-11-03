@@ -49,6 +49,7 @@ void CarteAction::jouer(Joueur* joueur) {
     std::cout << "\n⚡ " << nom << std::endl;
     std::cout << "   " << getFactionIcon() << " " << getFactionNom() << std::endl;
 
+
     // ════════════════════════════════════════════════════════
     // 1. EFFETS PRINCIPAUX (toujours activés)
     // ════════════════════════════════════════════════════════
@@ -240,3 +241,13 @@ int CarteAction::getOrPrincipal() const { return or_principal; }
 int CarteAction::getCombatPrincipal() const { return combat_principal; }
 int CarteAction::getSoinPrincipal() const { return soin_principal; }
 int CarteAction::getPiochePrincipal() const { return pioche_principal; }
+
+int CarteAction::getOrAllie() const { return or_allie; }
+int CarteAction::getCombatAllie() const { return combat_allie; }
+int CarteAction::getSoinAllie() const { return soin_allie; }
+int CarteAction::getPiocheAllie() const { return pioche_allie; }
+
+int CarteAction::getOrSacrifice() const { return or_sacrifice; }
+int CarteAction::getCombatSacrifice() const { return combat_sacrifice; }
+int CarteAction::getSoinSacrifice() const { return soin_sacrifice; }
+int CarteAction::getPiocheSacrifice() const { return pioche_sacrifice; }

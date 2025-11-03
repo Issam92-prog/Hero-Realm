@@ -6,8 +6,10 @@
 #include "cartes/CarteAction.hpp"
 #include "cartes/cartechampion.hpp"
 #include "cartes/CarteItem.hpp"
+#include "GodMode.hpp"
 #include <iostream>
 #include <limits>
+#include <algorithm>
 
 // ====== Constructeur & Destructeur ======
 
@@ -15,12 +17,16 @@ Jeu::Jeu()
     : jeu_en_cours_(false), 
       quitter_(false),
       nb_joueurs_(2),
-      pv_initial_(50) {
+      pv_initial_(50),
+      god_mode_(nullptr) {  
 }
 
 Jeu::~Jeu() {
+    if (god_mode_) {  
+        delete god_mode_;
+        god_mode_ = nullptr;
+    }
 }
-
 // ====== Initialisation ======
 
 void Jeu::lancer() {
@@ -39,10 +45,10 @@ void Jeu::lancer() {
                 Regle::afficherMenuRegles();
                 break;
             case 3:
-                std::cout << "\n📊 Crédits:" << std::endl;
+                std::cout << "\n📊 Info:" << std::endl;
                 std::cout << "   Hero Realms - Jeu de cartes" << std::endl;
-                std::cout << "   Développé par: Issam et Alexandre" << std::endl;
-                std::cout << "   Date: 2025-10-29" << std::endl;
+                std::cout << "   Développé par: Issam Atoui et Alexandre Fakhfakh" << std::endl;
+                std::cout << "   Date: 2025-11-02" << std::endl;
                 pause();
                 break;
             case 4:
@@ -63,6 +69,12 @@ void Jeu::nouvellePartie() {
 
     // Initialiser le plateau
     plateau_.initialiser(noms_joueurs_, pv_initial_);
+
+    // Créer le God Mode (après l'initialisation du plateau)
+    if (god_mode_) {
+        delete god_mode_;
+    }
+    god_mode_ = new GodMode(plateau_);  
 
     // Démarrer la partie
     plateau_.demarrerPartie();
@@ -113,6 +125,13 @@ void Jeu::boucleDeJeu() {
         // Exécuter le tour du joueur
         executerTour(joueur);
 
+        // Vérifier si le joueur a quitté
+        if (!jeu_en_cours_) {
+            std::cout << "\n⚠️  Partie interrompue par abandon." << std::endl;
+            pause();
+            return;  // Sortir sans afficher les résultats normaux
+        }
+
         // Vérifier la fin de partie
         if (plateau_.partieTerminee()) {
             jeu_en_cours_ = false;
@@ -123,8 +142,10 @@ void Jeu::boucleDeJeu() {
         plateau_.joueurSuivant();
     }
 
-    // Afficher les résultats
-    afficherResultats();
+    // Afficher les résultats (seulement si fin naturelle)
+    if (plateau_.partieTerminee()) {
+        afficherResultats();
+    }
 }
 
 void Jeu::executerTour(Joueur* joueur) {
@@ -148,7 +169,7 @@ void Jeu::executerTour(Joueur* joueur) {
         // Menu du tour
         afficherMenuTour();
 
-        int choix = lireEntier(1, 6);
+        int choix = lireEntier(1, 9);  // ← CHANGÉ de 8 à 9
 
         switch (choix) {
             case 1:
@@ -161,20 +182,67 @@ void Jeu::executerTour(Joueur* joueur) {
                 phaseAttaque(joueur);
                 break;
             case 4:
+                phaseChampions(joueur);
+                break;
+            case 5:
                 joueur->afficherStatistiques();
                 pause();
                 break;
-            case 5:
+            case 6:
                 afficherAide();
                 break;
-            case 6:
+            case 7:
                 if (confirmer("Êtes-vous sûr de vouloir terminer votre tour ?")) {
                     joueur->finDeTour();
                     tour_termine = true;
                 }
                 break;
+            case 8:  // ← NOUVEAU : God Mode
+                if (god_mode_) {
+                    god_mode_->afficherMenu();
+                } else {
+                    std::cout << "\n⚠️  God Mode non disponible !" << std::endl;
+                    pause();
+                }
+                break;
+            case 9:  // ← MODIFIÉ : Quitter (était case 8)
+                if (quitterPartie()) {
+                    jeu_en_cours_ = false;
+                    tour_termine = true;
+                }
+                break;
+        }
+        if (!jeu_en_cours_) {
+            break;
         }
     }
+}
+
+bool Jeu::quitterPartie() {
+    clearScreen();
+    std::cout << "\n╔════════════════════════════════════════════════════════╗" << std::endl;
+    std::cout << "║              🚪 QUITTER LA PARTIE 🚪                   ║" << std::endl;
+    std::cout << "╚════════════════════════════════════════════════════════╝" << std::endl;
+
+    std::cout << "\n⚠️  Attention : Vous êtes sur le point de quitter la partie en cours." << std::endl;
+    std::cout << "   Toute progression sera perdue.\n" << std::endl;
+
+    if (confirmer("Êtes-vous vraiment sûr de vouloir quitter ?")) {
+        std::cout << "\n📊 État de la partie avant abandon :" << std::endl;
+        
+        // Afficher le classement actuel
+        plateau_.afficherClassement();
+
+        std::cout << "\n👋 Partie abandonnée." << std::endl;
+        std::cout << "   Retour au menu principal...\n" << std::endl;
+        
+        pause();
+        return true;  // Confirme la sortie
+    }
+
+    std::cout << "\n✅ Retour à la partie..." << std::endl;
+    pause();
+    return false;  // Annule la sortie
 }
 
 // ====== Phases de Jeu ======
@@ -193,20 +261,167 @@ void Jeu::phaseJeu(Joueur* joueur) {
         return;
     }
 
-    std::cout << "\nQuelle carte voulez-vous jouer ? (0 pour annuler): ";
-    int choix = lireEntier(0, static_cast<int>(joueur->main().taille()));
+    std::cout << "\n╔════════════════════════════════════════════════════════╗" << std::endl;
+    std::cout << "║  Quelle carte voulez-vous jouer ?                      ║" << std::endl;
+    std::cout << "╚════════════════════════════════════════════════════════╝" << std::endl;
+    std::cout << "\n  [1-" << joueur->main().taille() << "] Jouer une carte spécifique" << std::endl;
+    std::cout << "  [ALL] Jouer TOUTES les cartes de la main" << std::endl;
+    std::cout << "  [0] Annuler" << std::endl;
+    std::cout << "\nChoix : ";
 
-    if (choix == 0) {
+    std::string choix_str;
+    std::getline(std::cin, choix_str);
+
+    // Convertir en minuscules pour faciliter la comparaison
+    std::transform(choix_str.begin(), choix_str.end(), choix_str.begin(), ::tolower);
+
+    if (choix_str == "0") {
         return;
     }
-
-    if (jouerCarte(joueur, choix - 1)) {
-        std::cout << "\n✅ Carte jouée avec succès !" << std::endl;
-    } else {
-        std::cout << "\n⚠️  Impossible de jouer cette carte !" << std::endl;
+    else if (choix_str == "all" || choix_str == "a") {
+        // Jouer toutes les cartes
+        jouerToutesLesCartes(joueur);
+    }
+    else {
+        // Jouer une carte spécifique
+        try {
+            int choix = std::stoi(choix_str);
+            if (choix < 1 || choix > static_cast<int>(joueur->main().taille())) {
+                std::cout << "\n⚠️  Choix invalide !" << std::endl;
+            } else {
+                if (jouerCarte(joueur, choix - 1)) {
+                    std::cout << "\n✅ Carte jouée avec succès !" << std::endl;
+                } else {
+                    std::cout << "\n⚠️  Impossible de jouer cette carte !" << std::endl;
+                }
+            }
+        } catch (...) {
+            std::cout << "\n⚠️  Entrée invalide !" << std::endl;
+        }
     }
 
     pause();
+}
+
+void Jeu::jouerToutesLesCartes(Joueur* joueur) {
+    if (!joueur) return;
+
+    std::cout << "\n╔════════════════════════════════════════════════════════╗" << std::endl;
+    std::cout << "║  🎴 JOUER TOUTES LES CARTES                            ║" << std::endl;
+    std::cout << "╚════════════════════════════════════════════════════════╝" << std::endl;
+
+    int nb_cartes = joueur->main().taille();
+    std::cout << "\n📋 Vous allez jouer " << nb_cartes << " carte(s)" << std::endl;
+    std::cout << "   (Les choix de sacrifice seront proposés individuellement)\n" << std::endl;
+
+    pause("Appuyez sur Entrée pour commencer...");
+
+    int cartes_jouees = 0;
+    int champions_joues = 0;
+    int actions_jouees = 0;
+    int items_joues = 0;
+    int cartes_sacrifiees = 0;
+
+    // Jouer toutes les cartes une par une
+    while (!joueur->main().estVide()) {
+        clearScreen();
+        
+        std::cout << "\n╔════════════════════════════════════════════════════════╗" << std::endl;
+        std::cout << "║  Carte " << (cartes_jouees + 1) << "/" << nb_cartes << std::endl;
+        std::cout << "╚════════════════════════════════════════════════════════╝" << std::endl;
+
+        // Afficher l'état actuel
+        std::cout << "\n📊 État actuel :" << std::endl;
+        std::cout << "   💰 Or : " << joueur->orTour() << std::endl;
+        std::cout << "   ⚔️  Combat : " << joueur->combatTour() << std::endl;
+        std::cout << "   💚 PV : " << joueur->pv() << std::endl;
+        std::cout << "   🎴 Cartes restantes : " << joueur->main().taille() << std::endl;
+
+        // Récupérer la première carte de la main
+        Carte* carte = joueur->main().getCarte(size_t(0));
+        if (!carte) {
+            break;
+        }
+
+        std::cout << "\n▶️  Carte en cours : " << carte->getNom() << std::endl;
+        std::cout << "═══════════════════════════════════════════════════════════" << std::endl;
+
+        // Retirer la carte de la main
+        joueur->main().retirerCarte(size_t(0));
+
+        // Enregistrer la faction jouée (pour effets alliés)
+        joueur->enregistrerFactionJouee(carte->getFaction());
+
+        // Jouer la carte (gestion interne du sacrifice)
+        carte->jouer(joueur);
+
+        // Gestion selon le type de carte
+        CarteChampion* champion = dynamic_cast<CarteChampion*>(carte);
+        CarteAction* action = dynamic_cast<CarteAction*>(carte);
+        CarteItem* item = dynamic_cast<CarteItem*>(carte);
+
+        if (champion) {
+            // Les champions vont dans la zone de jeu
+            joueur->zoneDeJeu().ajouterChampion(champion);
+            std::cout << "\n✅ " << champion->getNom() << " entre en jeu !" << std::endl;
+            champions_joues++;
+        } 
+        else {
+            // Vérifier si la carte a un effet de sacrifice
+            bool a_sacrifice = (action && action->aEffetSacrifice()) || 
+                              (item && item->aEffetSacrifice());
+            
+            if (a_sacrifice) {
+                // Demander confirmation pour le sacrifice
+                std::cout << "\n💀 Cette carte a-t-elle été sacrifiée ?" << std::endl;
+                if (confirmer("Confirmer le sacrifice")) {
+                    // Carte sacrifiée -> zone de sacrifice
+                    joueur->sacrifice().ajouterCarte(carte);
+                    std::cout << "💀 " << carte->getNom() << " a été sacrifiée (retirée du jeu)" << std::endl;
+                    cartes_sacrifiees++;
+                } else {
+                    // Carte non sacrifiée -> défausse
+                    joueur->defausse().ajouterCarte(carte);
+                    std::cout << "🗑️  " << carte->getNom() << " va en défausse" << std::endl;
+                }
+            } else {
+                // Pas de sacrifice possible -> défausse
+                joueur->defausse().ajouterCarte(carte);
+                std::cout << "🗑️  " << carte->getNom() << " va en défausse" << std::endl;
+            }
+
+            if (action) actions_jouees++;
+            if (item) items_joues++;
+        }
+
+        cartes_jouees++;
+
+        // Petite pause entre chaque carte (sauf pour la dernière)
+        if (!joueur->main().estVide()) {
+            pause("\nAppuyez sur Entrée pour la carte suivante...");
+        }
+    }
+
+    // Résumé final
+    clearScreen();
+    std::cout << "\n╔════════════════════════════════════════════════════════╗" << std::endl;
+    std::cout << "║  ✅ TOUTES LES CARTES ONT ÉTÉ JOUÉES !                 ║" << std::endl;
+    std::cout << "╚════════════════════════════════════════════════════════╝" << std::endl;
+
+    std::cout << "\n📊 Résumé du tour :" << std::endl;
+    std::cout << "   🎴 Cartes jouées : " << cartes_jouees << std::endl;
+    std::cout << "      👤 Champions : " << champions_joues << std::endl;
+    std::cout << "      ⚡ Actions : " << actions_jouees << std::endl;
+    std::cout << "      🔨 Items : " << items_joues << std::endl;
+    if (cartes_sacrifiees > 0) {
+        std::cout << "   💀 Cartes sacrifiées : " << cartes_sacrifiees << std::endl;
+    }
+
+    std::cout << "\n📈 État final :" << std::endl;
+    std::cout << "   💰 Or total : " << joueur->orTour() << std::endl;
+    std::cout << "   ⚔️  Combat total : " << joueur->combatTour() << std::endl;
+    std::cout << "   💚 PV : " << joueur->pv() << std::endl;
+    std::cout << "   🛡️  Champions en jeu : " << joueur->zoneDeJeu().taille() << std::endl;
 }
 
 void Jeu::phaseAchat(Joueur* joueur) {
@@ -316,6 +531,64 @@ void Jeu::phaseAttaque(Joueur* joueur) {
     pause();
 }
 
+void Jeu::phaseChampions(Joueur* joueur) {
+    clearScreen();
+    std::cout << "\n╔════════════════════════════════════════════════════════╗" << std::endl;
+    std::cout << "║          👤 ACTIVATION DES CHAMPIONS 👤                ║" << std::endl;
+    std::cout << "╚════════════════════════════════════════════════════════╝" << std::endl;
+
+    auto& champions = joueur->zoneDeJeu().champions();
+    
+    if (champions.empty()) {
+        std::cout << "\n⚠️  Vous n'avez aucun champion en jeu !" << std::endl;
+        pause();
+        return;
+    }
+
+    // Afficher les champions avec leurs capacités
+    joueur->afficherChampions();
+
+    std::cout << "\n╔════════════════════════════════════════════════════════╗" << std::endl;
+    std::cout << "║  Actions disponibles                                   ║" << std::endl;
+    std::cout << "╚════════════════════════════════════════════════════════╝" << std::endl;
+    std::cout << "\n  [1] Utiliser une capacité EXPEND" << std::endl;
+    std::cout << "  [0] Retour" << std::endl;
+    std::cout << "\nChoix: ";
+    
+    int choix = lireEntier(0, 1);
+    
+    if (choix == 0) {
+        return;
+    }
+    
+    if (choix == 1) {
+        std::cout << "\n╔════════════════════════════════════════════════════════╗" << std::endl;
+        std::cout << "║  Quel champion voulez-vous utiliser ?                  ║" << std::endl;
+        std::cout << "╚════════════════════════════════════════════════════════╝" << std::endl;
+        std::cout << "\n  [1-" << champions.size() << "] Choisir un champion" << std::endl;
+        std::cout << "  [0] Annuler" << std::endl;
+        std::cout << "\nChoix: ";
+        
+        int index = lireEntier(0, static_cast<int>(champions.size()));
+        
+        if (index > 0 && index <= static_cast<int>(champions.size())) {
+            CarteChampion* champion = champions[index - 1];
+            
+            if (!champion) {
+                std::cout << "\n⚠️  Champion invalide !" << std::endl;
+            } else if (!champion->aEffetExpend()) {
+                std::cout << "\n⚠️  " << champion->getNom() << " n'a pas de capacité Expend !" << std::endl;
+            } else if (champion->estExpended()) {
+                std::cout << "\n⚠️  " << champion->getNom() << " a déjà utilisé sa capacité Expend ce tour !" << std::endl;
+            } else {
+                champion->utiliserExpend(joueur);
+            }
+        }
+    }
+    
+    pause();
+}
+
 // ====== Actions de Jeu ======
 
 bool Jeu::jouerCarte(Joueur* joueur, int index) {
@@ -327,6 +600,9 @@ bool Jeu::jouerCarte(Joueur* joueur, int index) {
     // Retirer la carte de la main
     joueur->main().retirerCarte(index);
 
+    // Enregistrer la faction jouée (pour effets alliés)
+    joueur->enregistrerFactionJouee(carte->getFaction());
+
     // Jouer la carte
     carte->jouer(joueur);
 
@@ -337,8 +613,28 @@ bool Jeu::jouerCarte(Joueur* joueur, int index) {
         joueur->zoneDeJeu().ajouterChampion(champion);
         std::cout << "✅ " << champion->getNom() << " entre en jeu !" << std::endl;
     } else {
-        // Les actions/items vont en défausse
-        joueur->defausse().ajouterCarte(carte);
+        // Vérifier si c'est une Action ou un Item avec sacrifice
+        CarteAction* action = dynamic_cast<CarteAction*>(carte);
+        CarteItem* item = dynamic_cast<CarteItem*>(carte);
+        
+        bool a_sacrifice = (action && action->aEffetSacrifice()) || 
+                          (item && item->aEffetSacrifice());
+        
+        if (a_sacrifice) {
+            if (confirmer("Cette carte a-t-elle été sacrifiée ?")) {
+                // Carte sacrifiée -> zone de sacrifice
+                joueur->sacrifice().ajouterCarte(carte);
+                std::cout << "💀 " << carte->getNom() << " a été sacrifiée (retirée du jeu)" << std::endl;
+            } else {
+                // Carte non sacrifiée -> défausse
+                joueur->defausse().ajouterCarte(carte);
+                std::cout << "🗑️  " << carte->getNom() << " va en défausse" << std::endl;
+            }
+        } else {
+            // Pas de sacrifice possible -> défausse
+            joueur->defausse().ajouterCarte(carte);
+            std::cout << "🗑️  " << carte->getNom() << " va en défausse" << std::endl;
+        }
     }
 
     return true;
@@ -415,7 +711,7 @@ void Jeu::afficherMenuPrincipal() const {
     std::cout << "╚════════════════════════════════════════════════════════╝" << std::endl;
     std::cout << "\n  [1] 🎮 Nouvelle Partie" << std::endl;
     std::cout << "  [2] 📖 Règles du Jeu" << std::endl;
-    std::cout << "  [3] 📊 Crédits" << std::endl;
+    std::cout << "  [3] 📊 Info du Jeu" << std::endl;
     std::cout << "  [4] 🚪 Quitter" << std::endl;
     std::cout << "\nChoix: ";
 }
@@ -427,9 +723,12 @@ void Jeu::afficherMenuTour() const {
     std::cout << "\n  [1] 🎴 Jouer une Carte" << std::endl;
     std::cout << "  [2] 💰 Acheter une Carte" << std::endl;
     std::cout << "  [3] ⚔️  Attaquer" << std::endl;
-    std::cout << "  [4] 📊 Voir Statistiques" << std::endl;
-    std::cout << "  [5] ❓ Aide" << std::endl;
-    std::cout << "  [6] ✅ Terminer le Tour" << std::endl;
+    std::cout << "  [4] 👤 Activer les Champions" << std::endl;
+    std::cout << "  [5] 📊 Voir Statistiques" << std::endl;
+    std::cout << "  [6] ❓ Aide" << std::endl;
+    std::cout << "  [7] ✅ Terminer le Tour" << std::endl;
+    std::cout << "  [8] ⚡ God Mode" << std::endl;           
+    std::cout << "  [9] 🚪 Quitter la Partie" << std::endl;  
     std::cout << "\nChoix: ";
 }
 
@@ -459,7 +758,7 @@ void Jeu::pause(const std::string& message) const {
 
 void Jeu::clearScreen() const {
     // Simulation de nettoyage d'écran (portable)
-    std::cout << "\n\n\n\n\n\n\n\n\n\n";
+    std::cout << "\n\n\n";
     std::cout << "═══════════════════════════════════════════════════════════════" << std::endl;
 }
 
@@ -517,7 +816,11 @@ void Jeu::afficherAide() const {
     std::cout << "   💀 Sacrifice: Cartes retirées définitivement" << std::endl;
 
     std::cout << "\n🏪 MARCHÉ:" << std::endl;
-    std::cout << "   5 cartes disponibles + Gemmes de Feu infinies" << std::endl;
+    std::cout << "   5 cartes disponibles + 16 Gemmes de Feu au début" << std::endl;
+
+    std::cout << "\n👤 CHAMPIONS:" << std::endl;
+    std::cout << "   ⏸️  EXPEND: Capacité utilisable une fois par tour" << std::endl;
+    std::cout << "   🤝 ALLIÉ: Se déclenche quand une carte de même faction est jouée" << std::endl;
 
     pause();
 }
@@ -527,7 +830,7 @@ void Jeu::afficherTitre() const {
     std::cout << "\n";
     std::cout << "╔════════════════════════════════════════════════════════╗" << std::endl;
     std::cout << "║                                                        ║" << std::endl;
-    std::cout << "║            ⚔️  HERO REALMS ⚔️                         ║" << std::endl;
+    std::cout << "║            ⚔️  HERO REALMS ⚔️                          ║" << std::endl;
     std::cout << "║                                                        ║" << std::endl;
     std::cout << "║              Jeu de Cartes de Combat                   ║" << std::endl;
     std::cout << "║                                                        ║" << std::endl;

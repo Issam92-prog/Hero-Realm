@@ -163,7 +163,7 @@ void Defausse::afficherResume() const {
     // Compter par faction
     std::map<std::string, int> factions;
     factions["⚪ Sans faction"] = 0;
-    factions["🛡️  Imperial"] = 0;
+    factions["👑  Imperial"] = 0;
     factions["🏹 Guild"] = 0;
     factions["💀 Necros"] = 0;
     factions["🐺 Wild"] = 0;
@@ -177,7 +177,7 @@ void Defausse::afficherResume() const {
     for (const auto* carte : cartes_) {
         // Faction
         switch(carte->getFaction()) {
-            case Faction::IMPERIAL: factions["🛡️  Imperial"]++; break;
+            case Faction::IMPERIAL: factions["👑  Imperial"]++; break;
             case Faction::GUILD:    factions["🏹 Guild"]++; break;
             case Faction::NECROS:   factions["💀 Necros"]++; break;
             case Faction::WILD:     factions["🐺 Wild"]++; break;
@@ -211,7 +211,7 @@ void Defausse::afficherResume() const {
 
 std::string Defausse::getIconeFaction(int faction) const {
     switch(faction) {
-        case static_cast<int>(Faction::IMPERIAL): return "🛡️";
+        case static_cast<int>(Faction::IMPERIAL): return "👑";
         case static_cast<int>(Faction::GUILD):    return "🏹";
         case static_cast<int>(Faction::NECROS):   return "💀";
         case static_cast<int>(Faction::WILD):     return "🐺";

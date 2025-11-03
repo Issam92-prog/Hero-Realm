@@ -50,6 +50,14 @@ public:
     // Méthodes spécifiques aux champions
     void utiliserExpend(Joueur* joueur);
     void activerAllie(Joueur* joueur);
+    
+    /**
+     * @brief Vérifie et active les effets alliés si conditions remplies
+     * À appeler chaque fois qu'une nouvelle carte est jouée pendant le tour
+     * @param joueur Le joueur qui possède ce champion
+     */
+    void verifierEtActiverAllie(Joueur* joueur);
+    
     void subirDegats(int degats);
     void preparerPourNouveauTour(); // Reset expended
     void reparer(); // Restaure la défense au maximum
@@ -63,6 +71,21 @@ public:
     bool aEffetExpend() const;
     bool aEffetAllie() const;
     bool aEffetPrincipal() const;
+    
+    int getOrPrincipal() const;
+    int getCombatPrincipal() const;
+    int getSoinPrincipal() const;
+    int getPiochePrincipal() const;
+    
+    int getOrExpend() const;
+    int getCombatExpend() const;
+    int getSoinExpend() const;
+    int getPiocheExpend() const;
+    
+    int getOrAllie() const;
+    int getCombatAllie() const;
+    int getSoinAllie() const;
+    int getPiocheAllie() const;
 };
 
 #endif

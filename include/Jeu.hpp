@@ -7,6 +7,7 @@
 
 class Joueur;
 class Carte;
+class GodMode;  // ← LIGNE AJOUTÉE
 
 /**
  * @brief Représente le jeu Hero Realms complet
@@ -69,6 +70,12 @@ public:
      * @param joueur Le joueur actif
      */
     void phaseAttaque(Joueur* joueur);
+
+    /**
+     * @brief Phase d'activation des champions : utiliser les capacités Expend
+     * @param joueur Le joueur actif
+     */
+    void phaseChampions(Joueur* joueur);
 
     // Actions de jeu
     /**
@@ -172,6 +179,8 @@ private:
     int nb_joueurs_;
     std::vector<std::string> noms_joueurs_;
     int pv_initial_;
+    
+    GodMode* god_mode_;  // ← LIGNE AJOUTÉE - Mode triche
 
     /**
      * @brief Affiche l'écran de titre
@@ -184,6 +193,18 @@ private:
      * @return Joueur* La cible sélectionnée (nullptr si annulé)
      */
     Joueur* selectionnerCible(Joueur* attaquant) const;
+
+    /**
+     * @brief Joue toutes les cartes de la main du joueur
+     * @param joueur Le joueur actif
+     */
+    void jouerToutesLesCartes(Joueur* joueur);
+
+    /**
+     * @brief Permet de quitter la partie en cours avec confirmation
+     * @return true si le joueur confirme vouloir quitter, false sinon
+     */
+    bool quitterPartie();
 };
 
 #endif // JEU_HPP

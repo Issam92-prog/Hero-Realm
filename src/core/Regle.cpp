@@ -169,7 +169,7 @@ void Regle::afficherReglesBase() {
     std::cout << "      • Peuvent être attaqués par les adversaires\n";
     std::cout << "      • Ont des points de défense (DEF)\n";
     std::cout << "      • Vont en défausse quand vaincus (0 DEF)\n";
-    std::cout << "      • Peuvent avoir des capacités Expend (⏸️)\n\n";
+    std::cout << "      • Peuvent avoir des capacités Expend (⏸️  )\n\n";
 
     std::cout << "   ⚡ ACTIONS:\n";
     std::cout << "      • Effet immédiat quand jouées\n";
@@ -182,7 +182,7 @@ void Regle::afficherReglesBase() {
     std::cout << "      • Peuvent souvent être sacrifiées pour un effet bonus\n";
 
     afficherSection("🌟 FACTIONS", "🌟");
-    std::cout << "   🛡️  IMPERIAL (Bleu): Défense et vie\n";
+    std::cout << "   👑  IMPERIAL (Bleu): Défense et vie\n";
     std::cout << "   🏹 GUILD (Jaune): Or et acquisitions\n";
     std::cout << "   💀 NECROS (Vert): Sacrifice et pioche\n";
     std::cout << "   🐺 WILD (Rouge): Combat et agressivité\n";
