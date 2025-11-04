@@ -1,68 +1,119 @@
 #ifndef CARTEACTION_HPP
 #define CARTEACTION_HPP
 
-#include "Carte.hpp"
+#include "cartes/Carte.hpp"
+#include <functional>
+
+// Forward declarations
+class Joueur;
+class Game;
+
+// Type pour les callbacks d'effets spéciaux
+using EffetSpecialCallback = std::function<void(Joueur*, Game*)>;
 
 class CarteAction : public Carte {
-protected:
-    // Effets principaux (quand la carte est jouée)
+private:
+    // Effets numériques principaux
     int or_principal;
     int combat_principal;
     int soin_principal;
     int pioche_principal;
     
-    // Effet allié (si une autre carte de même faction est jouée)
+    // Effets alliés
     int or_allie;
     int combat_allie;
     int soin_allie;
     int pioche_allie;
     
-    // Effet de sacrifice (optionnel)
+    // Effets sacrifice
     int or_sacrifice;
     int combat_sacrifice;
     int soin_sacrifice;
     int pioche_sacrifice;
     bool a_effet_sacrifice;
+    
+    // Effets spéciaux (lambdas)
+    EffetSpecialCallback effet_special_principal_;
+    EffetSpecialCallback effet_special_allie_;
+    EffetSpecialCallback effet_special_sacrifice_;
 
 public:
-    CarteAction(int quantity, const std::string& nom, int cout, Faction faction);
+    // ════════════════════════════════════════════════════════
+    // CONSTRUCTEUR & DESTRUCTEUR
+    // ════════════════════════════════════════════════════════
     
+    CarteAction(int quantity, const std::string& nom, int cout, Faction faction);
     virtual ~CarteAction();
     
-    // Setters pour les effets principaux
-    void setEffetPrincipal(int or_val, int combat_val, int soin_val = 0, int pioche_val = 0);
+    // ════════════════════════════════════════════════════════
+    // SETTERS POUR EFFETS NUMÉRIQUES
+    // ════════════════════════════════════════════════════════
     
-    // Setters pour les effets alliés
-    void setEffetAllie(int or_val, int combat_val, int soin_val = 0, int pioche_val = 0);
+    void setEffetPrincipal(int or_val, int combat_val, int soin_val, int pioche_val);
+    void setEffetAllie(int or_val, int combat_val, int soin_val, int pioche_val);
+    void setEffetSacrifice(int or_val, int combat_val, int soin_val, int pioche_val);
     
-    // Setters pour les effets de sacrifice
-    void setEffetSacrifice(int or_val, int combat_val, int soin_val = 0, int pioche_val = 0);
+    // ════════════════════════════════════════════════════════
+    // SETTERS POUR EFFETS SPÉCIAUX
+    // ════════════════════════════════════════════════════════
     
-    // Override de Carte
+    void setEffetSpecialPrincipal(EffetSpecialCallback effet);
+    void setEffetSpecialAllie(EffetSpecialCallback effet);
+    void setEffetSpecialSacrifice(EffetSpecialCallback effet);
+    
+    // ════════════════════════════════════════════════════════
+    // GETTERS POUR EFFETS SPÉCIAUX (pour le clonage)
+    // ════════════════════════════════════════════════════════
+    
+    EffetSpecialCallback getEffetSpecialPrincipal() const;
+    EffetSpecialCallback getEffetSpecialAllie() const;
+    EffetSpecialCallback getEffetSpecialSacrifice() const;
+    
+    // ════════════════════════════════════════════════════════
+    // MÉTHODE PRINCIPALE
+    // ════════════════════════════════════════════════════════
+    
     void jouer(Joueur* joueur) override;
     void afficher() const override;
     
-    // Méthodes spécifiques aux actions
+    // ════════════════════════════════════════════════════════
+    // ACTIVATION DES EFFETS
+    // ════════════════════════════════════════════════════════
+    
     void activerAllie(Joueur* joueur);
     void sacrifier(Joueur* joueur);
     
-    // Getters
+    // ════════════════════════════════════════════════════════
+    // GETTERS - VÉRIFICATIONS
+    // ════════════════════════════════════════════════════════
+    
     bool aEffetAllie() const;
     bool aEffetSacrifice() const;
+    bool aEffetSpecialPrincipal() const;
+    bool aEffetSpecialAllie() const;
+    bool aEffetSpecialSacrifice() const;
+    
+    // ════════════════════════════════════════════════════════
+    // GETTERS - VALEURS NUMÉRIQUES
+    // ════════════════════════════════════════════════════════
+    
+    // Effets principaux
     int getOrPrincipal() const;
     int getCombatPrincipal() const;
     int getSoinPrincipal() const;
     int getPiochePrincipal() const;
     
+    // Effets alliés
     int getOrAllie() const;
     int getCombatAllie() const;
     int getSoinAllie() const;
     int getPiocheAllie() const;
     
+    // Effets sacrifice
     int getOrSacrifice() const;
     int getCombatSacrifice() const;
     int getSoinSacrifice() const;
     int getPiocheSacrifice() const;
 };
 
-#endif
+#endif // CARTEACTION_HPP

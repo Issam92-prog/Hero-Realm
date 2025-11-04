@@ -10,7 +10,9 @@
 #include <algorithm>
 #include <random>
 
-// ====== Constructeur & Destructeur ======
+// ════════════════════════════════════════════════════════
+// CONSTRUCTEUR & DESTRUCTEUR
+// ════════════════════════════════════════════════════════
 
 Marche::Marche() : rng_(std::random_device{}()) {
 }
@@ -19,7 +21,9 @@ Marche::~Marche() {
     nettoyer();
 }
 
-// ====== Initialisation ======
+// ════════════════════════════════════════════════════════
+// INITIALISATION
+// ════════════════════════════════════════════════════════
 
 void Marche::initialiser() {
     std::cout << "🏪 Initialisation du marché..." << std::endl;
@@ -69,7 +73,10 @@ void Marche::decompresserCartes(std::vector<Carte*>& templates, std::vector<Cart
 Carte* Marche::clonerCarte(const Carte* carte) {
     if (!carte) return nullptr;
 
-    // Déterminer le type de carte et créer une copie
+    // ════════════════════════════════════════════════════════
+    // CLONER CARTEITEM
+    // ════════════════════════════════════════════════════════
+    
     if (const CarteItem* item = dynamic_cast<const CarteItem*>(carte)) {
         CarteItem* copie = new CarteItem(
             1,  // Quantité toujours 1 pour les instances individuelles
@@ -91,6 +98,11 @@ Carte* Marche::clonerCarte(const Carte* carte) {
         
         return copie;
     }
+    
+    // ════════════════════════════════════════════════════════
+    // CLONER CARTEACTION (avec effets spéciaux)
+    // ════════════════════════════════════════════════════════
+    
     else if (const CarteAction* action = dynamic_cast<const CarteAction*>(carte)) {
         CarteAction* copie = new CarteAction(
             1,
@@ -100,7 +112,7 @@ Carte* Marche::clonerCarte(const Carte* carte) {
         );
         copie->setDescription(action->getDescription());
         
-        // Copier l'effet principal
+        // Copier l'effet principal numérique
         copie->setEffetPrincipal(
             action->getOrPrincipal(),
             action->getCombatPrincipal(),
@@ -108,7 +120,7 @@ Carte* Marche::clonerCarte(const Carte* carte) {
             action->getPiochePrincipal()
         );
         
-        // Copier l'effet allié si présent
+        // Copier l'effet allié numérique si présent
         if (action->aEffetAllie()) {
             copie->setEffetAllie(
                 action->getOrAllie(),
@@ -118,7 +130,7 @@ Carte* Marche::clonerCarte(const Carte* carte) {
             );
         }
         
-        // Copier l'effet sacrifice si présent
+        // Copier l'effet sacrifice numérique si présent
         if (action->aEffetSacrifice()) {
             copie->setEffetSacrifice(
                 action->getOrSacrifice(),
@@ -128,8 +140,26 @@ Carte* Marche::clonerCarte(const Carte* carte) {
             );
         }
         
+        // ✅ NOUVEAUTÉ : Copier les effets spéciaux (lambdas)
+        if (action->aEffetSpecialPrincipal()) {
+            copie->setEffetSpecialPrincipal(action->getEffetSpecialPrincipal());
+        }
+        
+        if (action->aEffetSpecialAllie()) {
+            copie->setEffetSpecialAllie(action->getEffetSpecialAllie());
+        }
+        
+        if (action->aEffetSpecialSacrifice()) {
+            copie->setEffetSpecialSacrifice(action->getEffetSpecialSacrifice());
+        }
+        
         return copie;
     }
+    
+    // ════════════════════════════════════════════════════════
+    // CLONER CARTECHAMPION
+    // ════════════════════════════════════════════════════════
+    
     else if (const CarteChampion* champion = dynamic_cast<const CarteChampion*>(carte)) {
         CarteChampion* copie = new CarteChampion(
             1,
@@ -203,7 +233,9 @@ void Marche::nettoyer() {
     gemmes_de_feu_.clear();
 }
 
-// ====== Achat de Cartes ======
+// ════════════════════════════════════════════════════════
+// ACHAT DE CARTES
+// ════════════════════════════════════════════════════════
 
 Carte* Marche::acheterCarte(size_t index) {
     if (index >= cartes_dispo_.size()) {
@@ -238,7 +270,9 @@ Carte* Marche::acheterGemmeDeFeu() {
     return gemme;
 }
 
-// ====== Gestion des Cartes ======
+// ════════════════════════════════════════════════════════
+// GESTION DES CARTES
+// ════════════════════════════════════════════════════════
 
 bool Marche::defausserCarte(size_t index) {
     if (index >= cartes_dispo_.size()) {
@@ -275,7 +309,9 @@ void Marche::melangerDeck() {
     std::cout << "🔀 Deck du marché mélangé" << std::endl;
 }
 
-// ====== Affichage ======
+// ════════════════════════════════════════════════════════
+// AFFICHAGE
+// ════════════════════════════════════════════════════════
 
 void Marche::afficher(bool afficher_details) const {
     std::cout << "\n╔════════════════════════════════════════════════════════╗" << std::endl;
@@ -384,7 +420,9 @@ std::string Marche::getIconeType(int type) const {
     }
 }
 
-// ====== Informations ======
+// ════════════════════════════════════════════════════════
+// INFORMATIONS
+// ════════════════════════════════════════════════════════
 
 size_t Marche::nbCartesDisponibles() const {
     return cartes_dispo_.size();
@@ -410,7 +448,9 @@ bool Marche::estPlein() const {
     return cartes_dispo_.size() >= 5;
 }
 
-// ====== Accès aux Cartes ======
+// ════════════════════════════════════════════════════════
+// ACCÈS AUX CARTES
+// ════════════════════════════════════════════════════════
 
 const Carte* Marche::getCarteDisponible(size_t index) const {
     if (index >= cartes_dispo_.size()) {
@@ -423,7 +463,9 @@ const std::vector<Carte*>& Marche::cartesDisponibles() const {
     return cartes_dispo_;
 }
 
-// ====== Opérateurs ======
+// ════════════════════════════════════════════════════════
+// OPÉRATEURS
+// ════════════════════════════════════════════════════════
 
 const Carte* Marche::operator[](size_t index) const {
     return getCarteDisponible(index);

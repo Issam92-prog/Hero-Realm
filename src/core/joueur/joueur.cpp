@@ -6,18 +6,16 @@
 #include <algorithm>
 #include <iostream>
 
-// ====== Ctor/Dtor ======
+// ════════════════════════════════════════════════════════
+// CONSTRUCTEUR & DESTRUCTEUR
+// ════════════════════════════════════════════════════════
+
 Joueur::Joueur(Id id, const std::string& nom, int pv_initial)
     : id_(id), nom_(nom), pv_(pv_initial) {
     initialiserDeckDeBase();
 }
 
 Joueur::~Joueur() {
-    // Nettoyer toutes les cartes de toutes les zones
-    // Note: Chaque zone contient des pointeurs vers les cartes,
-    // mais une carte peut être dans une seule zone à la fois.
-    // On doit éviter les double-delete.
-    
     // Collecter tous les pointeurs uniques
     std::vector<Carte*> toutes_cartes;
     
@@ -34,51 +32,69 @@ Joueur::~Joueur() {
     }
 }
 
-// ====== Identité ======
+// ════════════════════════════════════════════════════════
+// IDENTITÉ
+// ════════════════════════════════════════════════════════
+
 Joueur::Id Joueur::id() const { return id_; }
 const std::string& Joueur::nom() const { return nom_; }
 
-// ====== PV ======
+// ════════════════════════════════════════════════════════
+// POINTS DE VIE
+// ════════════════════════════════════════════════════════
+
 int Joueur::pv() const { return pv_; }
+
 void Joueur::soigner(int v) { 
     pv_ += v;
     std::cout << "💚 " << nom_ << " récupère " << v << " PV (Total: " << pv_ << ")" << std::endl;
 }
+
 void Joueur::subirDegats(int v) { 
     int degats = std::max(0, v);
     pv_ = std::max(0, pv_ - degats);
     std::cout << "💔 " << nom_ << " subit " << degats << " dégâts (PV restants: " << pv_ << ")" << std::endl;
 }
+
 bool Joueur::estMort() const { return pv_ <= 0; }
 
-// ====== Ressources ======
-int  Joueur::orTour() const { return or_tour_; }
-int  Joueur::combatTour() const { return combat_tour_; }
+// ════════════════════════════════════════════════════════
+// RESSOURCES (OR & COMBAT)
+// ════════════════════════════════════════════════════════
+
+int Joueur::orTour() const { return or_tour_; }
+int Joueur::combatTour() const { return combat_tour_; }
+
 void Joueur::ajouterOr(int n) { 
     or_tour_ += n;
     if (n > 0) {
         std::cout << "💰 +" << n << " or (Total: " << or_tour_ << ")" << std::endl;
     }
 }
+
 void Joueur::ajouterCombat(int n) { 
     combat_tour_ += n;
     if (n > 0) {
         std::cout << "⚔️  +" << n << " combat (Total: " << combat_tour_ << ")" << std::endl;
     }
 }
+
 void Joueur::resetRessources() { 
     or_tour_ = 0; 
     combat_tour_ = 0; 
 }
 
-// ====== Cycle ======
+// ════════════════════════════════════════════════════════
+// CYCLE DE JEU (DÉBUT/FIN DE TOUR)
+// ════════════════════════════════════════════════════════
+
 void Joueur::debutDeTour() {
-    std::cout << "\n╔════════════════════════════════════╗" << std::endl;
-    std::cout << "║  Tour de " << nom_ << std::endl;
-    std::cout << "╚════════════════════════════════════╝" << std::endl;
+    std::cout << "\n╔════════════════════════════════════════════════════════╗" << std::endl;
+    std::cout << "║  🎮 DÉBUT DE TOUR - " << nom_ << std::endl;
+    std::cout << "╚════════════════════════════════════════════════════════╝" << std::endl;
     
     resetRessources();
-    reinitialiserFactionsJouees();  // important pour les effets alliés
+    reinitialiserFactionsJouees();
     preparerChampions();
 }
 
@@ -98,7 +114,10 @@ void Joueur::finDeTour() {
     piocher(5);
 }
 
-// ====== Pioche ======
+// ════════════════════════════════════════════════════════
+// PIOCHE & INITIALISATION
+// ════════════════════════════════════════════════════════
+
 void Joueur::piocher(int n) {
     auto cartes_piochees = pioche_.piocher(n, defausse_.cartes());
     for (auto* carte : cartes_piochees) {
@@ -133,7 +152,10 @@ void Joueur::initialiserDeckDeBase() {
     std::cout << "✅ Deck initialisé (7 Or + 1 Épée courte + 1 Dague + 1 Rubis)" << std::endl;
 }
 
-// ====== Gestion des Champions ======
+// ════════════════════════════════════════════════════════
+// GESTION DES CHAMPIONS
+// ════════════════════════════════════════════════════════
+
 void Joueur::jouerChampion(CarteChampion* champion) {
     if (!champion) {
         std::cout << "⚠️  Champion invalide !" << std::endl;
@@ -150,7 +172,6 @@ void Joueur::jouerChampion(CarteChampion* champion) {
     zone_de_jeu_.ajouterChampion(champion);
     
     // Jouer le champion (effets d'entrée en jeu)
-    // Note: la méthode jouer() du champion gère déjà l'activation des alliés
     champion->jouer(this);
     
     std::cout << "✅ " << champion->getNom() << " entre en jeu !" << std::endl;
@@ -178,7 +199,36 @@ bool Joueur::aChampionsGarde() const {
     return zone_de_jeu_.aChampionsGarde();
 }
 
-// ====== Gestion du Sacrifice ======
+// ════════════════════════════════════════════════════════
+// COMPTAGE DES CHAMPIONS (POUR EFFETS CONDITIONNELS)
+// ════════════════════════════════════════════════════════
+
+int Joueur::compterChampionsEnJeu() const {
+    return zone_de_jeu_.taille();
+}
+
+int Joueur::compterChampionsVivants() const {
+    return zone_de_jeu_.compterVivants();
+}
+
+int Joueur::compterChampionsFaction(Faction faction) const {
+    int count = 0;
+    for (const auto* champion : zone_de_jeu_.champions()) {
+        if (champion && champion->getFaction() == faction) {
+            count++;
+        }
+    }
+    return count;
+}
+
+int Joueur::compterChampionsGarde() const {
+    return zone_de_jeu_.compterGardes();
+}
+
+// ════════════════════════════════════════════════════════
+// GESTION DU SACRIFICE
+// ════════════════════════════════════════════════════════
+
 void Joueur::sacrifierCarte(Carte* carte) {
     // Retirer la carte de la main
     if (!main_.retirerCarte(carte)) {
@@ -190,11 +240,14 @@ void Joueur::sacrifierCarte(Carte* carte) {
     sacrifice_.ajouterCarte(carte);
 }
 
-// ====== Affichage ======
+// ════════════════════════════════════════════════════════
+// AFFICHAGE
+// ════════════════════════════════════════════════════════
+
 void Joueur::afficherZones() const {
-    std::cout << "\n╔════════════════════════════════════╗" << std::endl;
+    std::cout << "\n╔════════════════════════════════════════════════════════╗" << std::endl;
     std::cout << "║  Zones de " << nom_ << std::endl;
-    std::cout << "╚════════════════════════════════════╝" << std::endl;
+    std::cout << "╚════════════════════════════════════════════════════════╝" << std::endl;
     
     std::cout << "\n📊 Vue d'ensemble:" << std::endl;
     std::cout << "   💚 PV: " << pv_ << std::endl;
@@ -251,30 +304,29 @@ void Joueur::afficherStatistiques() const {
     }
 }
 
-// ====== Accesseurs des Zones (non-const) ======
+// ════════════════════════════════════════════════════════
+// ACCESSEURS DES ZONES (NON-CONST)
+// ════════════════════════════════════════════════════════
+
 Pioche& Joueur::pioche() { return pioche_; }
 MainJoueur& Joueur::main() { return main_; }
 ZoneDeJeu& Joueur::zoneDeJeu() { return zone_de_jeu_; }
 Defausse& Joueur::defausse() { return defausse_; }
 Sacrifice& Joueur::sacrifice() { return sacrifice_; }
 
-// ====== Accesseurs des Zones (const) ======
+// ════════════════════════════════════════════════════════
+// ACCESSEURS DES ZONES (CONST)
+// ════════════════════════════════════════════════════════
+
 const Pioche& Joueur::pioche() const { return pioche_; }
 const MainJoueur& Joueur::main() const { return main_; }
 const ZoneDeJeu& Joueur::zoneDeJeu() const { return zone_de_jeu_; }
 const Defausse& Joueur::defausse() const { return defausse_; }
 const Sacrifice& Joueur::sacrifice() const { return sacrifice_; }
 
-// ====== GESTION DES EFFETS ALLIÉS ======
-
-bool Joueur::aJoueFaction(Faction faction) const {
-    for (const auto& f : factions_jouees_ce_tour_) {
-        if (f == faction) {
-            return true;
-        }
-    }
-    return false;
-}
+// ════════════════════════════════════════════════════════
+// GESTION DES EFFETS ALLIÉS
+// ════════════════════════════════════════════════════════
 
 void Joueur::enregistrerFactionJouee(Faction faction) {
     factions_jouees_ce_tour_.push_back(faction);
@@ -282,4 +334,29 @@ void Joueur::enregistrerFactionJouee(Faction faction) {
 
 void Joueur::reinitialiserFactionsJouees() {
     factions_jouees_ce_tour_.clear();
+}
+
+bool Joueur::aJoueFaction(Faction faction) const {
+    // L'effet allié s'active SI il y a AU MOINS 2 cartes de cette faction
+    return compterCartesJoueesFaction(faction) >= 2;
+}
+
+int Joueur::compterCartesJoueesFaction(Faction faction) const {
+    int count = 0;
+    
+    // 1️⃣ Compter les cartes/actions jouées CE TOUR (dans le vecteur)
+    for (const auto& f : factions_jouees_ce_tour_) {
+        if (f == faction) {
+            count++;
+        }
+    }
+    
+    // 2️⃣ Compter AUSSI les champions en jeu (même des tours précédents)
+    for (const auto* champion : zone_de_jeu_.champions()) {
+        if (champion && champion->getFaction() == faction) {
+            count++;
+        }
+    }
+    
+    return count;
 }

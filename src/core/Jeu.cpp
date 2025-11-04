@@ -349,9 +349,6 @@ void Jeu::jouerToutesLesCartes(Joueur* joueur) {
         // Retirer la carte de la main
         joueur->main().retirerCarte(size_t(0));
 
-        // Enregistrer la faction jouée (pour effets alliés)
-        joueur->enregistrerFactionJouee(carte->getFaction());
-
         // Jouer la carte (gestion interne du sacrifice)
         carte->jouer(joueur);
 
@@ -599,9 +596,6 @@ bool Jeu::jouerCarte(Joueur* joueur, int index) {
 
     // Retirer la carte de la main
     joueur->main().retirerCarte(index);
-
-    // Enregistrer la faction jouée (pour effets alliés)
-    joueur->enregistrerFactionJouee(carte->getFaction());
 
     // Jouer la carte
     carte->jouer(joueur);
