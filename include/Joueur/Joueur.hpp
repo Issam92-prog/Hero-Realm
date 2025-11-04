@@ -107,6 +107,7 @@ public:
     const Sacrifice& sacrifice() const;
 
     int compterCartesJoueesFaction(Faction faction) const;
+    int compterChampionsEnJeuFaction(Faction faction) const;
     
     
 

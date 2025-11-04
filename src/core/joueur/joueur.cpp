@@ -344,14 +344,8 @@ bool Joueur::aJoueFaction(Faction faction) const {
 int Joueur::compterCartesJoueesFaction(Faction faction) const {
     int count = 0;
     
-    // 1️⃣ Compter les cartes/actions jouées CE TOUR (dans le vecteur)
-    for (const auto& f : factions_jouees_ce_tour_) {
-        if (f == faction) {
-            count++;
-        }
-    }
-    
-    // 2️⃣ Compter AUSSI les champions en jeu (même des tours précédents)
+    // 1️⃣ Compter UNIQUEMENT les champions en jeu
+    // (Les champions restent en jeu, donc on les compte toujours)
     for (const auto* champion : zone_de_jeu_.champions()) {
         if (champion && champion->getFaction() == faction) {
             count++;
