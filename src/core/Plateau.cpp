@@ -1,5 +1,6 @@
 #include "Plateau.hpp"
 #include "Joueur/Joueur.hpp"
+#include "Regle.hpp"
 #include <iostream>
 #include <algorithm>
 
@@ -26,10 +27,15 @@ void Plateau::initialiser(const std::vector<std::string>& noms_joueurs, int pv_i
     // Nettoyer si déjà initialisé
     nettoyer();
 
-    // Créer les joueurs
+    // Créer les joueurs avec la distribution de cartes appropriée
     std::cout << "\n👥 Création des joueurs..." << std::endl;
+    int position = 1;
+    int nb_joueurs = noms_joueurs.size();
+    
     for (const auto& nom : noms_joueurs) {
-        ajouterJoueur(nom, pv_initial);
+        int nb_cartes = Regle::getCartesDepart(position, nb_joueurs);
+        ajouterJoueur(nom, pv_initial, nb_cartes);
+        position++;
     }
 
     // Initialiser le marché
@@ -38,12 +44,29 @@ void Plateau::initialiser(const std::vector<std::string>& noms_joueurs, int pv_i
     std::cout << "\n✅ Plateau initialisé avec " << joueurs_.size() << " joueur(s)" << std::endl;
 }
 
-Joueur* Plateau::ajouterJoueur(const std::string& nom, int pv_initial) {
+Joueur* Plateau::ajouterJoueur(const std::string& nom, int pv_initial, int nb_cartes_initiales) {
     Joueur::Id id = genererIdJoueur();
+    
+    // Créer le joueur sans initialiser le deck automatiquement
+    // (on le fera manuellement avec le bon nombre de cartes)
     Joueur* joueur = new Joueur(id, nom, pv_initial);
+    
+    // Le constructeur a déjà appelé initialiserDeckDeBase(5)
+    // Si on a besoin d'un nombre différent, on ajuste
+    if (nb_cartes_initiales != 5) {
+        // Vider la main actuelle
+        while (!joueur->main().estVide()) {
+            Carte* carte = joueur->main().retirerCarte(static_cast<size_t>(0));
+            joueur->pioche().cartes().push_back(carte);
+        }
+        // Remélanger et piocher le bon nombre
+        joueur->pioche().melanger();
+        joueur->piocher(nb_cartes_initiales);
+    }
+    
     joueurs_.push_back(joueur);
     
-    std::cout << "   ✅ Joueur #" << id << ": " << nom << " (PV: " << pv_initial << ")" << std::endl;
+    std::cout << "   ✅ Joueur #" << id << ": " << nom << " (PV: " << pv_initial << ", Main: " << nb_cartes_initiales << " cartes)" << std::endl;
     
     return joueur;
 }

@@ -39,9 +39,10 @@ public:
      * @brief Ajoute un joueur au plateau
      * @param nom Nom du joueur
      * @param pv_initial Points de vie initiaux
+     * @param nb_cartes_initiales Nombre de cartes à piocher au départ
      * @return Joueur* Pointeur vers le joueur créé
      */
-    Joueur* ajouterJoueur(const std::string& nom, int pv_initial = 50);
+    Joueur* ajouterJoueur(const std::string& nom, int pv_initial = 50, int nb_cartes_initiales = 5);
 
     /**
      * @brief Nettoie la mémoire du plateau

@@ -117,27 +117,25 @@ void Regle::afficherModeChacunPourSoi() {
     std::cout << "   • Type: Free-for-all (Chacun contre tous)\n";
 
     afficherSection("📜 RÈGLES", "📜");
-    std::cout << "   Ceci est le mode de jeu par défaut de Hero Realms.\n";
-
-    afficherSection("🎲 MISE EN PLACE", "🎲");
-    std::cout << "   • Déterminez au hasard qui commencera\n";
-    std::cout << "   • Jouez chacun dans le sens des aiguilles d'une montre\n";
+    std::cout << "   Ceci est le mode de jeu par défaut.\n";
+    std::cout << "   Déterminez au hasard qui commencera, puis jouez chacun\n";
+    std::cout << "   dans le sens des aiguilles d'une montre.\n";
 
     afficherSection("✋ MAIN DE DÉPART", "✋");
     std::cout << "   📌 PARTIE À 2 JOUEURS:\n";
-    std::cout << "      • Les 2 joueurs commencent avec 5 cartes\n\n";
+    std::cout << "      • Les 2 joueurs commencent avec 5 cartes 🎴🎴🎴🎴🎴\n\n";
 
     std::cout << "   📌 PARTIE À 3 JOUEURS ET PLUS:\n";
     std::cout << "      • 1er joueur : 3 cartes 🎴🎴🎴\n";
     std::cout << "      • 2ème joueur : 4 cartes 🎴🎴🎴🎴\n";
-    std::cout << "      • Autres joueurs : 5 cartes 🎴🎴🎴🎴🎴\n\n";
+    std::cout << "      • 3ème joueur et suivants : 5 cartes 🎴🎴🎴🎴🎴\n\n";
 
     std::cout << "   💡 Pourquoi cette différence ?\n";
     std::cout << "      Le premier joueur a un avantage tactique en jouant en premier.\n";
     std::cout << "      Commencer avec moins de cartes compense cet avantage.\n";
 
     afficherSection("⚔️  RÈGLES DE COMBAT", "⚔️");
-    std::cout << "   • Vous pouvez attaquer TOUS les autres joueurs\n";
+    std::cout << "   • Les joueurs peuvent attaquer TOUS les autres joueurs\n";
     std::cout << "   • Vous choisissez qui attaquer à chaque utilisation de Combat\n";
     std::cout << "   • Vous pouvez répartir vos attaques entre plusieurs cibles\n";
     std::cout << "   • Exemple: Avec 6 ⚔️  Combat, vous pouvez:\n";
@@ -152,9 +150,9 @@ void Regle::afficherModeChacunPourSoi() {
     std::cout << "   • Une fois tous les Gardes vaincus, vous pouvez attaquer le joueur\n";
 
     afficherSection("🏆 CONDITION DE VICTOIRE", "🏆");
-    std::cout << "   • Le dernier joueur en vie remporte la partie !\n";
+    std::cout << "   • Le dernier joueur en lice remporte la partie !\n";
     std::cout << "   • Si vous êtes éliminé (0 PV), vous êtes hors jeu\n";
-    std::cout << "   • Vos cartes et champions restent visibles mais ne sont plus actifs\n";
+    std::cout << "   • La partie continue jusqu'à ce qu'il ne reste qu'un seul joueur\n";
 
     afficherSeparateur();
 }
