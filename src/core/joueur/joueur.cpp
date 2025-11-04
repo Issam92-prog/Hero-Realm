@@ -5,6 +5,7 @@
 #include "enum/Faction.hpp"
 #include <algorithm>
 #include <iostream>
+#include <set> 
 
 // ════════════════════════════════════════════════════════
 // CONSTRUCTEUR & DESTRUCTEUR
@@ -16,17 +17,27 @@ Joueur::Joueur(Id id, const std::string& nom, int pv_initial)
 }
 
 Joueur::~Joueur() {
-    // Collecter tous les pointeurs uniques
-    std::vector<Carte*> toutes_cartes;
+    // Utiliser un set pour garantir l'unicité des pointeurs
+    std::set<Carte*> toutes_cartes;
     
-    // Ajouter les cartes de chaque zone
-    for (auto* c : main_.cartes()) toutes_cartes.push_back(c);
-    for (auto* c : pioche_.cartes()) toutes_cartes.push_back(c);
-    for (auto* c : defausse_.cartes()) toutes_cartes.push_back(c);
-    for (auto* c : zone_de_jeu_.champions()) toutes_cartes.push_back(c);
-    for (auto* c : sacrifice_.cartes()) toutes_cartes.push_back(c);
+    // Ajouter les cartes de chaque zone (doublons automatiquement ignorés)
+    for (auto* c : main_.cartes()) {
+        if (c) toutes_cartes.insert(c);
+    }
+    for (auto* c : pioche_.cartes()) {
+        if (c) toutes_cartes.insert(c);
+    }
+    for (auto* c : defausse_.cartes()) {
+        if (c) toutes_cartes.insert(c);
+    }
+    for (auto* c : zone_de_jeu_.champions()) {
+        if (c) toutes_cartes.insert(c);
+    }
+    for (auto* c : sacrifice_.cartes()) {
+        if (c) toutes_cartes.insert(c);
+    }
     
-    // Supprimer toutes les cartes
+    // Supprimer chaque carte une seule fois
     for (auto* c : toutes_cartes) {
         delete c;
     }

@@ -9,6 +9,7 @@
 #include <iostream>
 #include <algorithm>
 #include <random>
+#include <set> 
 
 // ════════════════════════════════════════════════════════
 // CONSTRUCTEUR & DESTRUCTEUR
@@ -208,28 +209,32 @@ Carte* Marche::clonerCarte(const Carte* carte) {
 }
 
 void Marche::nettoyer() {
-    // Supprimer toutes les cartes du deck
-    for (auto* carte : deck_marche_) {
-        delete carte;
+    // Utiliser un set pour garantir l'unicité
+    std::set<Carte*> toutes_cartes_marche;
+    
+    // Collecter toutes les cartes (doublons automatiquement ignorés)
+    for (auto* c : deck_marche_) {
+        if (c) toutes_cartes_marche.insert(c);
     }
+    for (auto* c : cartes_dispo_) {
+        if (c) toutes_cartes_marche.insert(c);
+    }
+    for (auto* c : defausse_marche_) {
+        if (c) toutes_cartes_marche.insert(c);
+    }
+    for (auto* g : gemmes_de_feu_) {
+        if (g) toutes_cartes_marche.insert(g);
+    }
+    
+    // Supprimer chaque carte une seule fois
+    for (auto* c : toutes_cartes_marche) {
+        delete c;
+    }
+    
+    // Vider tous les vecteurs
     deck_marche_.clear();
-
-    // Supprimer les cartes disponibles
-    for (auto* carte : cartes_dispo_) {
-        delete carte;
-    }
     cartes_dispo_.clear();
-
-    // Supprimer les cartes défaussées
-    for (auto* carte : defausse_marche_) {
-        delete carte;
-    }
     defausse_marche_.clear();
-
-    // Supprimer les gemmes de feu
-    for (auto* gemme : gemmes_de_feu_) {
-        delete gemme;
-    }
     gemmes_de_feu_.clear();
 }
 
