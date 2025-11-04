@@ -579,7 +579,7 @@ void Jeu::phaseChampions(Joueur* joueur) {
             } else if (champion->estExpended()) {
                 std::cout << "\n⚠️  " << champion->getNom() << " a déjà utilisé sa capacité Expend ce tour !" << std::endl;
             } else {
-                champion->utiliserExpend(joueur);
+                champion->utiliserExpend(joueur, this);
             }
         }
     }

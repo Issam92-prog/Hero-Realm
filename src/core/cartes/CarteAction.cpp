@@ -22,6 +22,41 @@ CarteAction::~CarteAction() {
 }
 
 // ════════════════════════════════════════════════════════
+// CLONE (copie profonde avec lambdas)
+// ════════════════════════════════════════════════════════
+
+CarteAction* CarteAction::clone() const {
+    CarteAction* copie = new CarteAction(quantity, nom, cout, faction);
+    copie->setDescription(description);
+    
+    // Copier effets principaux
+    copie->or_principal = or_principal;
+    copie->combat_principal = combat_principal;
+    copie->soin_principal = soin_principal;
+    copie->pioche_principal = pioche_principal;
+    
+    // Copier effets alliés
+    copie->or_allie = or_allie;
+    copie->combat_allie = combat_allie;
+    copie->soin_allie = soin_allie;
+    copie->pioche_allie = pioche_allie;
+    
+    // Copier effets sacrifice
+    copie->or_sacrifice = or_sacrifice;
+    copie->combat_sacrifice = combat_sacrifice;
+    copie->soin_sacrifice = soin_sacrifice;
+    copie->pioche_sacrifice = pioche_sacrifice;
+    copie->a_effet_sacrifice = a_effet_sacrifice;
+    
+    // Copier les lambdas
+    copie->effet_special_principal_ = effet_special_principal_;
+    copie->effet_special_allie_ = effet_special_allie_;
+    copie->effet_special_sacrifice_ = effet_special_sacrifice_;
+    
+    return copie;
+}
+
+// ════════════════════════════════════════════════════════
 // SETTERS POUR EFFETS NUMÉRIQUES
 // ════════════════════════════════════════════════════════
 

@@ -13,6 +13,18 @@ CarteItem::CarteItem(int quantity, const std::string& nom, int cout, Faction fac
 CarteItem::~CarteItem() {
 }
 
+// ════════════════════════════════════════════════════════
+// CLONE (copie profonde)
+// ════════════════════════════════════════════════════════
+
+CarteItem* CarteItem::clone() const {
+    CarteItem* copie = new CarteItem(quantity, nom, cout, faction, or_genere, combat_genere);
+    copie->setDescription(description);
+    copie->sacrifice_or = sacrifice_or;
+    copie->sacrifice_combat = sacrifice_combat;
+    return copie;
+}
+
 void CarteItem::setEffets(int or_val, int combat_val) {
     or_genere = or_val;
     combat_genere = combat_val;

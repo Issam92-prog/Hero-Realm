@@ -27,6 +27,12 @@ public:
     void jouer(Joueur* joueur) override;
     void afficher() const override;
     
+    /**
+     * @brief Clone cette carte item avec tous ses effets
+     * @return CarteItem* Une nouvelle instance identique
+     */
+    CarteItem* clone() const;
+    
     // Méthode de sacrifice
     void sacrifier(Joueur* joueur);
     
