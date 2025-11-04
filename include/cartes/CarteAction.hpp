@@ -76,6 +76,12 @@ public:
     void jouer(Joueur* joueur) override;
     void afficher() const override;
     
+    /**
+     * @brief Clone cette carte action avec tous ses effets (y compris les lambdas)
+     * @return CarteAction* Une nouvelle instance identique
+     */
+    CarteAction* clone() const;
+    
     // ════════════════════════════════════════════════════════
     // ACTIVATION DES EFFETS
     // ════════════════════════════════════════════════════════

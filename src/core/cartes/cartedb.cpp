@@ -44,10 +44,15 @@ std::vector<Carte*> CarteDB::getImperialCards() {
     commandement->setEffetPrincipal(2, 3, 4, 1);
     cards.push_back(commandement);
     
-    // Darian, Mage de Guerre (1 exemplaire)
+    // ════════════════════════════════════════════════════════
+    // Darian, Mage de Guerre (1 exemplaire) - CORRIGÉ
+    // ════════════════════════════════════════════════════════
     CarteChampion* darian = new CarteChampion(1, "Darian, Mage de Guerre", 4, IMPERIAL, 5, false);
     darian->setDescription("Expend: Gain 3 combat or 4 health");
-    darian->setEffetExpend(0, 3, 0, 0); // TODO: Choix combat ou santé
+    darian->setEffetExpend(0, 0, 0, 0); // Pas d'effets automatiques
+    darian->setEffetSpecialExpend([](Joueur* j, Jeu* g) {
+        EffetChampion::darianWarMageExpend(j, g);
+    });
     cards.push_back(darian);
     
     // ════════════════════════════════════════════════════════
@@ -236,11 +241,15 @@ std::vector<Carte*> CarteDB::getGuildCards() {
     benefice->setEffetAllie(0, 4, 0, 0);
     cards.push_back(benefice);
     
-    // Rake, Maître Assassin (1 exemplaire)
+    // ════════════════════════════════════════════════════════
+    // Rake, Maître Assassin (1 exemplaire) - CORRIGÉ
+    // ════════════════════════════════════════════════════════
     CarteChampion* rake = new CarteChampion(1, "Rake, Maître Assassin", 7, GUILD, 7, false);
     rake->setDescription("Expend: Gain 4 combat. You may stun target champion");
     rake->setEffetExpend(0, 4, 0, 0);
-    // TODO: Effet optionnel assommer champion
+    rake->setEffetSpecialExpend([](Joueur* j, Jeu* g) {
+        EffetChampion::rakeMasterAssassinExpend(j, g);
+    });
     cards.push_back(rake);
     
     // Rasmus, le Contrebandier (1 exemplaire)
@@ -262,11 +271,15 @@ std::vector<Carte*> CarteDB::getGuildCards() {
     });
     cards.push_back(casser);
     
-    // Bandit des Rues (2 exemplaires)
+    // ════════════════════════════════════════════════════════
+    // Bandit des Rues (2 exemplaires) - CORRIGÉ
+    // ════════════════════════════════════════════════════════
     CarteChampion* bandit = new CarteChampion(2, "Bandit des Rues", 3, GUILD, 4, false);
     bandit->setDescription("Expend: Gain 1 gold or 2 combat");
-    bandit->setEffetExpend(1, 0, 0, 0);
-    // TODO: Choix or ou combat
+    bandit->setEffetExpend(0, 0, 0, 0); // Pas d'effets automatiques
+    bandit->setEffetSpecialExpend([](Joueur* j, Jeu* g) {
+        EffetChampion::streetThugExpend(j, g);
+    });
     cards.push_back(bandit);
     
     return cards;
@@ -336,11 +349,15 @@ std::vector<Carte*> CarteDB::getNecrosCards() {
     influence->setEffetSacrifice(0, 3, 0, 0);
     cards.push_back(influence);
     
-    // Krythos, Maître Vampire (1 exemplaire)
+    // ════════════════════════════════════════════════════════
+    // Krythos, Maître Vampire (1 exemplaire) - CORRIGÉ
+    // ════════════════════════════════════════════════════════
     CarteChampion* krythos = new CarteChampion(1, "Krythos, Maître Vampire", 7, NECROS, 6, false);
     krythos->setDescription("Expend: Gain 3 combat. You may sacrifice a card in your hand or discard pile. If you do, gain an additional 3 combat");
     krythos->setEffetExpend(0, 3, 0, 0);
-    // TODO: Effet expend sacrifier autre carte + bonus
+    krythos->setEffetSpecialExpend([](Joueur* j, Jeu* g) {
+        EffetChampion::krythosMasterVampireExpend(j, g);
+    });
     cards.push_back(krythos);
     
     // ════════════════════════════════════════════════════════
@@ -378,23 +395,27 @@ std::vector<Carte*> CarteDB::getNecrosCards() {
     cards.push_back(tyrannor);
     
     // ════════════════════════════════════════════════════════
-    // Lys, l'Inapparent (1 exemplaire)
+    // Lys, l'Inapparent (1 exemplaire) - CORRIGÉ
     // ════════════════════════════════════════════════════════
     CarteChampion* lys = new CarteChampion(1, "Lys, l'Inapparent", 6, NECROS, 5, true);
     lys->setDescription("Expend: Gain 2 combat. You may sacrifice a card in your hand or discard pile. If you do, gain an additional 2 combat\nAlly: Draw a card");
     lys->setEffetExpend(0, 2, 0, 0);
-    lys->setEffetAllie(0, 0, 0, 1); // Pioche 1 carte
-    // TODO: Effet expend sacrifier + bonus
+    lys->setEffetAllie(0, 0, 0, 1);
+    lys->setEffetSpecialExpend([](Joueur* j, Jeu* g) {
+        EffetChampion::lysTheUnseenExpend(j, g);
+    });
     cards.push_back(lys);
     
     // ════════════════════════════════════════════════════════
-    // Varrick, le Nécromancien (1 exemplaire)
+    // Varrick, le Nécromancien (1 exemplaire) - CORRIGÉ
     // ════════════════════════════════════════════════════════
     CarteChampion* varrick = new CarteChampion(1, "Varrick, le Nécromancien", 5, NECROS, 3, false);
     varrick->setDescription("Expend: Take a champion from your discard pile and put it on top of your deck\nAlly: Draw a card");
     varrick->setEffetExpend(0, 0, 0, 0);
-    varrick->setEffetAllie(0, 0, 0, 1); // Pioche 1 carte
-    // TODO: Effet expend champion de défausse → deck
+    varrick->setEffetAllie(0, 0, 0, 1);
+    varrick->setEffetSpecialExpend([](Joueur* j, Jeu* g) {
+        EffetChampion::varrickNecromancerExpend(j, g);
+    });
     cards.push_back(varrick);
     
     return cards;
@@ -403,11 +424,15 @@ std::vector<Carte*> CarteDB::getNecrosCards() {
 std::vector<Carte*> CarteDB::getWildCards() {
     std::vector<Carte*> cards;
     
-    // Broelyn, Tisseuse de Savoirs (1 exemplaire)
+    // ════════════════════════════════════════════════════════
+    // Broelyn, Tisseuse de Savoirs (1 exemplaire) - CORRIGÉ
+    // ════════════════════════════════════════════════════════
     CarteChampion* broelyn = new CarteChampion(1, "Broelyn, Tisseuse de Savoirs", 4, WILD, 6, false);
     broelyn->setDescription("Expend: Gain 2 gold\nAlly: Target opponent discards a card");
     broelyn->setEffetExpend(2, 0, 0, 0);
-    // TODO: Effet allié défausser carte adverse
+    broelyn->setEffetSpecialAllie([](Joueur* j, Jeu* g) {
+        EffetChampion::broelynLoreweaverAlly(j, g);
+    });
     cards.push_back(broelyn);
     
     // ════════════════════════════════════════════════════════
@@ -453,14 +478,14 @@ std::vector<Carte*> CarteDB::getWildCards() {
     cards.push_back(don_elf);
     
     // ════════════════════════════════════════════════════════
-    // Grak, Géant de la Tempête (1 exemplaire) - EFFET SPÉCIAL ALLIÉ
+    // Grak, Géant de la Tempête (1 exemplaire) - CORRIGÉ
     // ════════════════════════════════════════════════════════
     CarteChampion* grak = new CarteChampion(1, "Grak, Géant de la Tempête", 8, WILD, 7, true);
     grak->setDescription("Expend: Gain 6 combat. You may draw a card. If you do, discard a card\nAlly: Draw a card, then discard a card");
     grak->setEffetExpend(0, 6, 0, 0);
-    grak->setEffetAllie(0, 0, 0, 1); // Marquer qu'il a un effet allié (pioche)
-    // TODO: Effet expend piocher puis défausser (optionnel)
-    // ← EFFET SPÉCIAL ALLIÉ : Piocher puis défausser (obligatoire)
+    grak->setEffetSpecialExpend([](Joueur* j, Jeu* g) {
+        EffetChampion::grakStormGiantExpend(j, g);
+    });
     grak->setEffetSpecialAllie([](Joueur* j, Jeu* g) {
         EffetChampion::grakStormGiantAlly(j, g);
     });
@@ -496,11 +521,15 @@ std::vector<Carte*> CarteDB::getWildCards() {
     });
     cards.push_back(sauvagerie);
     
-    // Torgen Brise-Pierre (1 exemplaire)
+    // ════════════════════════════════════════════════════════
+    // Torgen Brise-Pierre (1 exemplaire) - CORRIGÉ
+    // ════════════════════════════════════════════════════════
     CarteChampion* torgen = new CarteChampion(1, "Torgen Brise-Pierre", 7, WILD, 7, true);
     torgen->setDescription("Expend: Gain 4 combat. Target opponent discards a card");
     torgen->setEffetExpend(0, 4, 0, 0);
-    // TODO: Effet expend défausser carte adverse
+    torgen->setEffetSpecialExpend([](Joueur* j, Jeu* g) {
+        EffetChampion::torgenRocksplitterExpend(j, g);
+    });
     cards.push_back(torgen);
     
     // ════════════════════════════════════════════════════════

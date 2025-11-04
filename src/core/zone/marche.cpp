@@ -1,9 +1,9 @@
-#include "zone/Marche.hpp"
-#include "cartes/Carte.hpp"
-#include "cartes/CarteItem.hpp"
-#include "cartes/CarteAction.hpp"
-#include "cartes/CarteChampion.hpp"
+#include "zone/marche.hpp"
 #include "cartes/CarteDB.hpp"
+#include "cartes/Carte.hpp"
+#include "cartes/CarteChampion.hpp"
+#include "cartes/CarteAction.hpp"
+#include "cartes/CarteItem.hpp"
 #include "enum/Faction.hpp"
 #include "enum/TypeCarte.hpp"
 #include <iostream>
@@ -21,25 +21,60 @@ Marche::~Marche() {
     nettoyer();
 }
 
-// ════════════════════════════════════════════════════════
-// INITIALISATION
-// ════════════════════════════════════════════════════════
-
 void Marche::initialiser() {
-    std::cout << "🏪 Initialisation du marché..." << std::endl;
+    std::cout << "\n╔════════════════════════════════════════════════════════╗" << std::endl;
+    std::cout << "║  🏪 INITIALISATION DU MARCHÉ                           ║" << std::endl;
+    std::cout << "╚════════════════════════════════════════════════════════╝" << std::endl;
 
     // Nettoyer si déjà initialisé
     nettoyer();
 
     // Charger et décompresser les Gemmes de Feu depuis CarteDB
     auto gemmes_templates = CarteDB::getFireGems();
-    decompresserCartes(gemmes_templates, gemmes_de_feu_);
+    
+    for (auto* template_carte : gemmes_templates) {
+        int quantite = template_carte->getQuantity();
+        
+        // Créer autant de copies que la quantité indique en utilisant clone()
+        for (int i = 0; i < quantite; i++) {
+            if (CarteItem* item = dynamic_cast<CarteItem*>(template_carte)) {
+                gemmes_de_feu_.push_back(item->clone());
+            }
+        }
+        
+        // Libérer le template original
+        delete template_carte;
+    }
     
     std::cout << "   🔥 " << gemmes_de_feu_.size() << " Gemmes de Feu chargées" << std::endl;
 
-    // Charger toutes les cartes du marché depuis CarteDB (méthode unique)
+    // Charger toutes les cartes du marché depuis CarteDB
     auto market_templates = CarteDB::getAllMarketCards();
-    decompresserCartes(market_templates, deck_marche_);
+    
+    for (auto* template_carte : market_templates) {
+        int quantite = template_carte->getQuantity();
+        
+        // Créer autant de copies que la quantité indique en utilisant clone()
+        for (int i = 0; i < quantite; i++) {
+            Carte* copie = nullptr;
+            
+            // Utiliser les méthodes clone() polymorphes
+            if (CarteChampion* champion = dynamic_cast<CarteChampion*>(template_carte)) {
+                copie = champion->clone();
+            } else if (CarteAction* action = dynamic_cast<CarteAction*>(template_carte)) {
+                copie = action->clone();
+            } else if (CarteItem* item = dynamic_cast<CarteItem*>(template_carte)) {
+                copie = item->clone();
+            }
+            
+            if (copie) {
+                deck_marche_.push_back(copie);
+            }
+        }
+        
+        // Libérer le template original
+        delete template_carte;
+    }
 
     std::cout << "   📦 " << deck_marche_.size() << " cartes chargées" << std::endl;
 
@@ -50,161 +85,6 @@ void Marche::initialiser() {
     remplirMarche();
 
     std::cout << "✅ Marché initialisé !" << std::endl;
-}
-
-void Marche::decompresserCartes(std::vector<Carte*>& templates, std::vector<Carte*>& destination) {
-    for (auto* template_carte : templates) {
-        int quantite = template_carte->getQuantity();
-        
-        // Créer autant de copies que la quantité indique
-        for (int i = 0; i < quantite; i++) {
-            Carte* copie = clonerCarte(template_carte);
-            if (copie) {
-                destination.push_back(copie);
-            }
-        }
-        
-        // Libérer le template original
-        delete template_carte;
-    }
-    templates.clear();
-}
-
-Carte* Marche::clonerCarte(const Carte* carte) {
-    if (!carte) return nullptr;
-
-    // ════════════════════════════════════════════════════════
-    // CLONER CARTEITEM
-    // ════════════════════════════════════════════════════════
-    
-    if (const CarteItem* item = dynamic_cast<const CarteItem*>(carte)) {
-        CarteItem* copie = new CarteItem(
-            1,  // Quantité toujours 1 pour les instances individuelles
-            item->getNom(),
-            item->getCout(),
-            item->getFaction(),
-            item->getOr(),
-            item->getCombat()
-        );
-        copie->setDescription(item->getDescription());
-        
-        // Copier les effets de sacrifice si présents
-        if (item->getSacrificeOr() > 0 || item->getSacrificeCombat() > 0) {
-            copie->setEffetSacrifice(
-                item->getSacrificeOr(),
-                item->getSacrificeCombat()
-            );
-        }
-        
-        return copie;
-    }
-    
-    // ════════════════════════════════════════════════════════
-    // CLONER CARTEACTION (avec effets spéciaux)
-    // ════════════════════════════════════════════════════════
-    
-    else if (const CarteAction* action = dynamic_cast<const CarteAction*>(carte)) {
-        CarteAction* copie = new CarteAction(
-            1,
-            action->getNom(),
-            action->getCout(),
-            action->getFaction()
-        );
-        copie->setDescription(action->getDescription());
-        
-        // Copier l'effet principal numérique
-        copie->setEffetPrincipal(
-            action->getOrPrincipal(),
-            action->getCombatPrincipal(),
-            action->getSoinPrincipal(),
-            action->getPiochePrincipal()
-        );
-        
-        // Copier l'effet allié numérique si présent
-        if (action->aEffetAllie()) {
-            copie->setEffetAllie(
-                action->getOrAllie(),
-                action->getCombatAllie(),
-                action->getSoinAllie(),
-                action->getPiocheAllie()
-            );
-        }
-        
-        // Copier l'effet sacrifice numérique si présent
-        if (action->aEffetSacrifice()) {
-            copie->setEffetSacrifice(
-                action->getOrSacrifice(),
-                action->getCombatSacrifice(),
-                action->getSoinSacrifice(),
-                action->getPiocheSacrifice()
-            );
-        }
-        
-        // ✅ NOUVEAUTÉ : Copier les effets spéciaux (lambdas)
-        if (action->aEffetSpecialPrincipal()) {
-            copie->setEffetSpecialPrincipal(action->getEffetSpecialPrincipal());
-        }
-        
-        if (action->aEffetSpecialAllie()) {
-            copie->setEffetSpecialAllie(action->getEffetSpecialAllie());
-        }
-        
-        if (action->aEffetSpecialSacrifice()) {
-            copie->setEffetSpecialSacrifice(action->getEffetSpecialSacrifice());
-        }
-        
-        return copie;
-    }
-    
-    // ════════════════════════════════════════════════════════
-    // CLONER CARTECHAMPION
-    // ════════════════════════════════════════════════════════
-    
-    else if (const CarteChampion* champion = dynamic_cast<const CarteChampion*>(carte)) {
-        CarteChampion* copie = new CarteChampion(
-            1,
-            champion->getNom(),
-            champion->getCout(),
-            champion->getFaction(),
-            champion->getDefense(),
-            champion->estGarde()
-        );
-        copie->setDescription(champion->getDescription());
-        
-        // Copier l'effet principal si présent
-        if (champion->aEffetPrincipal()) {
-            copie->setEffetPrincipal(
-                champion->getOrPrincipal(),
-                champion->getCombatPrincipal(),
-                champion->getSoinPrincipal(),
-                champion->getPiochePrincipal()
-            );
-        }
-        
-        // Copier l'effet Expend si présent
-        if (champion->aEffetExpend()) {
-            copie->setEffetExpend(
-                champion->getOrExpend(),
-                champion->getCombatExpend(),
-                champion->getSoinExpend(),
-                champion->getPiocheExpend()
-            );
-        }
-        
-        // Copier l'effet allié si présent
-        if (champion->aEffetAllie()) {
-            copie->setEffetAllie(
-                champion->getOrAllie(),
-                champion->getCombatAllie(),
-                champion->getSoinAllie(),
-                champion->getPiocheAllie()
-            );
-        }
-        
-        return copie;
-    }
-    
-    return nullptr;
 }
 
 void Marche::nettoyer() {

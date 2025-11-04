@@ -129,7 +129,7 @@ void Joueur::piocher(int n) {
     }
 }
 
-void Joueur::initialiserDeckDeBase(int nb_cartes_initiales) {
+void Joueur::initialiserDeckDeBase() {
     std::cout << "🎲 Initialisation du deck de " << nom_ << "..." << std::endl;
     
     // 7 Or (1 or chacune)
@@ -147,7 +147,6 @@ void Joueur::initialiserDeckDeBase(int nb_cartes_initiales) {
     pioche_.cartes().push_back(new CarteItem(1, "Rubis", 0, Faction::NONE, 2, 0));
 
     pioche_.melanger();
-    piocher(nb_cartes_initiales);
     
     std::cout << "✅ Deck initialisé (7 Or + 1 Épée courte + 1 Dague + 1 Rubis)" << std::endl;
 }

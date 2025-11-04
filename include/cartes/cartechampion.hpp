@@ -39,6 +39,11 @@ protected:
     
     // Effets spéciaux d'allié (lambdas)
     EffetSpecialChampionCallback effet_special_allie_;
+    
+    // ════════════════════════════════════════════════════════
+    // NOUVEAU : Effets spéciaux d'expend (lambdas)
+    // ════════════════════════════════════════════════════════
+    EffetSpecialChampionCallback effet_special_expend_;
 
 public:
     CarteChampion(int quantity, const std::string& nom, int cout, 
@@ -58,12 +63,23 @@ public:
     // Setter pour effet spécial d'allié
     void setEffetSpecialAllie(EffetSpecialChampionCallback effet);
     
+    // ════════════════════════════════════════════════════════
+    // NOUVEAU : Setter pour effet spécial d'expend
+    // ════════════════════════════════════════════════════════
+    void setEffetSpecialExpend(EffetSpecialChampionCallback effet);
+    
     // Override de Carte
     void jouer(Joueur* joueur) override;
     void afficher() const override;
     
+    /**
+     * @brief Clone cette carte champion avec tous ses effets (y compris les lambdas)
+     * @return CarteChampion* Une nouvelle instance identique
+     */
+    CarteChampion* clone() const;
+    
     // Méthodes spécifiques aux champions
-    void utiliserExpend(Joueur* joueur);
+    void utiliserExpend(Joueur* joueur, Jeu* jeu = nullptr);
     void activerAllie(Joueur* joueur, Jeu* jeu = nullptr);
     
     /**

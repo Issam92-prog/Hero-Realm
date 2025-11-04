@@ -1,5 +1,6 @@
 #include "cartes/CarteChampion.hpp"
 #include "Joueur/Joueur.hpp"
+#include "Jeu.hpp"
 #include <iostream>
 
 // ════════════════════════════════════════════════════════
@@ -14,10 +15,43 @@ CarteChampion::CarteChampion(int quantity, const std::string& nom, int cout,
       or_principal(0), combat_principal(0), soin_principal(0), pioche_principal(0),
       or_expend(0), combat_expend(0), soin_expend(0), pioche_expend(0),
       or_allie(0), combat_allie(0), soin_allie(0), pioche_allie(0),
-      effet_special_allie_(nullptr) {
+      effet_special_allie_(nullptr), effet_special_expend_(nullptr) {
 }
 
 CarteChampion::~CarteChampion() {
+}
+
+// ════════════════════════════════════════════════════════
+// CLONE (copie profonde avec lambdas)
+// ════════════════════════════════════════════════════════
+
+CarteChampion* CarteChampion::clone() const {
+    CarteChampion* copie = new CarteChampion(quantity, nom, cout, faction, defense, est_garde);
+    copie->setDescription(description);
+    
+    // Copier les effets principaux
+    copie->or_principal = or_principal;
+    copie->combat_principal = combat_principal;
+    copie->soin_principal = soin_principal;
+    copie->pioche_principal = pioche_principal;
+    
+    // Copier les effets expend
+    copie->or_expend = or_expend;
+    copie->combat_expend = combat_expend;
+    copie->soin_expend = soin_expend;
+    copie->pioche_expend = pioche_expend;
+    
+    // Copier les effets alliés
+    copie->or_allie = or_allie;
+    copie->combat_allie = combat_allie;
+    copie->soin_allie = soin_allie;
+    copie->pioche_allie = pioche_allie;
+    
+    // IMPORTANT : Copier les lambdas (std::function supporte la copie)
+    copie->effet_special_allie_ = effet_special_allie_;
+    copie->effet_special_expend_ = effet_special_expend_;
+    
+    return copie;
 }
 
 // ════════════════════════════════════════════════════════
@@ -47,6 +81,10 @@ void CarteChampion::setEffetAllie(int or_val, int combat_val, int soin_val, int 
 
 void CarteChampion::setEffetSpecialAllie(EffetSpecialChampionCallback effet) {
     effet_special_allie_ = effet;
+}
+
+void CarteChampion::setEffetSpecialExpend(EffetSpecialChampionCallback effet) {
+    effet_special_expend_ = effet;
 }
 
 // ════════════════════════════════════════════════════════
@@ -173,14 +211,14 @@ void CarteChampion::jouer(Joueur* joueur) {
 
     std::cout << "\n✅ " << nom << " entre en jeu !" << std::endl;
     std::cout << "   État : ⚡ PRÊT (peut utiliser ses capacités)" << std::endl;
-    std::cout << "════════════════════════════════════════════════════════════" << std::endl;
+    std::cout << "═══════════════════════════════════════════════════════════\n" << std::endl;
 }
 
 // ════════════════════════════════════════════════════════
-// UTILISER LA CAPACITÉ EXPEND
+// UTILISER LA CAPACITÉ EXPEND (MODIFIÉ)
 // ════════════════════════════════════════════════════════
 
-void CarteChampion::utiliserExpend(Joueur* joueur) {
+void CarteChampion::utiliserExpend(Joueur* joueur, Jeu* jeu) {
     if (!joueur) {
         std::cerr << "❌ Erreur : Joueur invalide !" << std::endl;
         return;
@@ -191,13 +229,14 @@ void CarteChampion::utiliserExpend(Joueur* joueur) {
         return;
     }
     
-    if (!aEffetExpend()) {
+    if (!aEffetExpend() && !effet_special_expend_) {
         std::cout << "⚠️  " << nom << " n'a pas d'effet Expend." << std::endl;
         return;
     }
     
     std::cout << "\n⏸️  Activation de la capacité EXPEND de " << nom << " :" << std::endl;
     
+    // Effets numériques de base
     if (or_expend > 0) {
         joueur->ajouterOr(or_expend);
     }
@@ -213,6 +252,12 @@ void CarteChampion::utiliserExpend(Joueur* joueur) {
     if (pioche_expend > 0) {
         std::cout << "   📚 Pioche " << pioche_expend << " carte(s)" << std::endl;
         joueur->piocher(pioche_expend);
+    }
+    
+    // Effet spécial d'expend
+    if (effet_special_expend_ && jeu) {
+        std::cout << "   ✨ Effet spécial d'expend :" << std::endl;
+        effet_special_expend_(joueur, jeu);
     }
     
     est_expended = true;
@@ -379,7 +424,10 @@ bool CarteChampion::estVivant() const {
 }
 
 bool CarteChampion::aEffetExpend() const {
-    return (or_expend > 0 || combat_expend > 0 || soin_expend > 0 || pioche_expend > 0);
+    bool a_numerique = (or_expend > 0 || combat_expend > 0 || soin_expend > 0 || pioche_expend > 0);
+    bool a_special = (effet_special_expend_ != nullptr);
+    
+    return a_numerique || a_special;
 }
 
 bool CarteChampion::aEffetAllie() const {

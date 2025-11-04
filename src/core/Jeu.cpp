@@ -197,7 +197,7 @@ void Jeu::executerTour(Joueur* joueur) {
                     tour_termine = true;
                 }
                 break;
-            case 8:  // ← NOUVEAU : God Mode
+            case 8:
                 if (god_mode_) {
                     god_mode_->afficherMenu();
                 } else {
@@ -579,7 +579,7 @@ void Jeu::phaseChampions(Joueur* joueur) {
             } else if (champion->estExpended()) {
                 std::cout << "\n⚠️  " << champion->getNom() << " a déjà utilisé sa capacité Expend ce tour !" << std::endl;
             } else {
-                champion->utiliserExpend(joueur);
+                champion->utiliserExpend(joueur, this);
             }
         }
     }

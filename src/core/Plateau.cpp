@@ -47,22 +47,11 @@ void Plateau::initialiser(const std::vector<std::string>& noms_joueurs, int pv_i
 Joueur* Plateau::ajouterJoueur(const std::string& nom, int pv_initial, int nb_cartes_initiales) {
     Joueur::Id id = genererIdJoueur();
     
-    // Créer le joueur sans initialiser le deck automatiquement
-    // (on le fera manuellement avec le bon nombre de cartes)
+    // Créer le joueur avec l'initialisation du deck de base
     Joueur* joueur = new Joueur(id, nom, pv_initial);
     
-    // Le constructeur a déjà appelé initialiserDeckDeBase(5)
-    // Si on a besoin d'un nombre différent, on ajuste
-    if (nb_cartes_initiales != 5) {
-        // Vider la main actuelle
-        while (!joueur->main().estVide()) {
-            Carte* carte = joueur->main().retirerCarte(static_cast<size_t>(0));
-            joueur->pioche().cartes().push_back(carte);
-        }
-        // Remélanger et piocher le bon nombre
-        joueur->pioche().melanger();
-        joueur->piocher(nb_cartes_initiales);
-    }
+    // Piocher le nombre de cartes initiales (toujours, pas seulement si != 5)
+    joueur->piocher(nb_cartes_initiales);
     
     joueurs_.push_back(joueur);
     
