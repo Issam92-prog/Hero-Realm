@@ -45,7 +45,7 @@ public:
 
     // ====== Pioche ======
     void piocher(int n = 1);
-    void initialiserDeckDeBase();
+    void initialiserDeckDeBase(int nb_cartes_initiales = 5);
 
     // ====== Gestion des Champions ======
     void jouerChampion(CarteChampion* champion);
@@ -107,6 +107,7 @@ public:
     const Sacrifice& sacrifice() const;
 
     int compterCartesJoueesFaction(Faction faction) const;
+    int compterChampionsEnJeuFaction(Faction faction) const;
     
     
 

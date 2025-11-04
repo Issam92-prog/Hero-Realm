@@ -1,5 +1,6 @@
 #include "cartes/CarteDB.hpp"
-#include "effets/EffetAction.hpp" 
+#include "effets/EffetAction.hpp"
+#include "effets/EffetChampion.hpp"
 #include "Joueur/Joueur.hpp"
 
 std::vector<Carte*> CarteDB::getFireGems() {
@@ -68,11 +69,13 @@ std::vector<Carte*> CarteDB::getImperialCards() {
     cristov->setEffetAllie(0, 0, 0, 1);
     cards.push_back(cristov);
     
+    // ════════════════════════════════════════════════════════
     // Kraka, Grand Prêtre (1 exemplaire)
+    // ════════════════════════════════════════════════════════
     CarteChampion* kraka = new CarteChampion(1, "Kraka, Grand Prêtre", 6, IMPERIAL, 6, false);
-    kraka->setDescription("Expend: Gain 2 health. Draw a card.\nAlly: Gain 2 health for each champion you have in play");
+    kraka->setDescription("Expend: Gain 2 health. Draw a card.\nAlly: Draw a card");
     kraka->setEffetExpend(0, 0, 2, 1);
-    // TODO: Effet allié bonus santé par champion
+    kraka->setEffetAllie(0, 0, 0, 1); // Pioche 1 carte
     cards.push_back(kraka);
     
     // Homme d'Armes (2 exemplaires)
@@ -374,18 +377,23 @@ std::vector<Carte*> CarteDB::getNecrosCards() {
     // TODO: Effet expend sacrifier jusqu'à 2 cartes
     cards.push_back(tyrannor);
     
+    // ════════════════════════════════════════════════════════
     // Lys, l'Inapparent (1 exemplaire)
+    // ════════════════════════════════════════════════════════
     CarteChampion* lys = new CarteChampion(1, "Lys, l'Inapparent", 6, NECROS, 5, true);
-    lys->setDescription("Expend: Gain 2 combat. You may sacrifice a card in your hand or discard pile. If you do, gain an additional 2 combat");
+    lys->setDescription("Expend: Gain 2 combat. You may sacrifice a card in your hand or discard pile. If you do, gain an additional 2 combat\nAlly: Draw a card");
     lys->setEffetExpend(0, 2, 0, 0);
+    lys->setEffetAllie(0, 0, 0, 1); // Pioche 1 carte
     // TODO: Effet expend sacrifier + bonus
     cards.push_back(lys);
     
+    // ════════════════════════════════════════════════════════
     // Varrick, le Nécromancien (1 exemplaire)
+    // ════════════════════════════════════════════════════════
     CarteChampion* varrick = new CarteChampion(1, "Varrick, le Nécromancien", 5, NECROS, 3, false);
     varrick->setDescription("Expend: Take a champion from your discard pile and put it on top of your deck\nAlly: Draw a card");
     varrick->setEffetExpend(0, 0, 0, 0);
-    varrick->setEffetAllie(0, 0, 0, 1);
+    varrick->setEffetAllie(0, 0, 0, 1); // Pioche 1 carte
     // TODO: Effet expend champion de défausse → deck
     cards.push_back(varrick);
     
@@ -402,11 +410,13 @@ std::vector<Carte*> CarteDB::getWildCards() {
     // TODO: Effet allié défausser carte adverse
     cards.push_back(broelyn);
     
+    // ════════════════════════════════════════════════════════
     // Cron, le Berserker (1 exemplaire)
+    // ════════════════════════════════════════════════════════
     CarteChampion* cron = new CarteChampion(1, "Cron, le Berserker", 6, WILD, 6, false);
     cron->setDescription("Expend: Gain 5 combat\nAlly: Draw a card");
     cron->setEffetExpend(0, 5, 0, 0);
-    cron->setEffetAllie(0, 0, 0, 1);
+    cron->setEffetAllie(0, 0, 0, 1); // Pioche 1 carte
     cards.push_back(cron);
     
     // Loup Terrifiant (1 exemplaire)
@@ -442,12 +452,18 @@ std::vector<Carte*> CarteDB::getWildCards() {
     });
     cards.push_back(don_elf);
     
-    // Grak, Géant de la Tempête (1 exemplaire)
+    // ════════════════════════════════════════════════════════
+    // Grak, Géant de la Tempête (1 exemplaire) - EFFET SPÉCIAL ALLIÉ
+    // ════════════════════════════════════════════════════════
     CarteChampion* grak = new CarteChampion(1, "Grak, Géant de la Tempête", 8, WILD, 7, true);
     grak->setDescription("Expend: Gain 6 combat. You may draw a card. If you do, discard a card\nAlly: Draw a card, then discard a card");
     grak->setEffetExpend(0, 6, 0, 0);
+    grak->setEffetAllie(0, 0, 0, 1); // Marquer qu'il a un effet allié (pioche)
     // TODO: Effet expend piocher puis défausser (optionnel)
-    // TODO: Effet allié piocher puis défausser (obligatoire)
+    // ← EFFET SPÉCIAL ALLIÉ : Piocher puis défausser (obligatoire)
+    grak->setEffetSpecialAllie([](Joueur* j, Jeu* g) {
+        EffetChampion::grakStormGiantAlly(j, g);
+    });
     cards.push_back(grak);
     
     // Don de la Nature (1 exemplaire)
