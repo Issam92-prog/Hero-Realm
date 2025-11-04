@@ -2,6 +2,10 @@
 #include "Joueur/Joueur.hpp"
 #include <iostream>
 
+// ════════════════════════════════════════════════════════
+// CONSTRUCTEUR & DESTRUCTEUR
+// ════════════════════════════════════════════════════════
+
 CarteChampion::CarteChampion(int quantity, const std::string& nom, int cout, 
                              Faction faction, int defense, bool garde)
     : Carte(quantity, nom, cout, faction, CHAMPION),
@@ -13,6 +17,10 @@ CarteChampion::CarteChampion(int quantity, const std::string& nom, int cout,
 
 CarteChampion::~CarteChampion() {
 }
+
+// ════════════════════════════════════════════════════════
+// SETTERS POUR EFFETS
+// ════════════════════════════════════════════════════════
 
 void CarteChampion::setEffetPrincipal(int or_val, int combat_val, int soin_val, int pioche_val) {
     or_principal = or_val;
@@ -35,11 +43,19 @@ void CarteChampion::setEffetAllie(int or_val, int combat_val, int soin_val, int 
     pioche_allie = pioche_val;
 }
 
+// ════════════════════════════════════════════════════════
+// MÉTHODE PRINCIPALE : JOUER UN CHAMPION
+// ════════════════════════════════════════════════════════
+
 void CarteChampion::jouer(Joueur* joueur) {
     if (!joueur) {
         std::cerr << "❌ Erreur : Joueur invalide !" << std::endl;
         return;
     }
+
+    // ════════════════════════════════════════════════════════
+    // AFFICHAGE
+    // ════════════════════════════════════════════════════════
 
     std::cout << "\n╔════════════════════════════════════════════════════════╗" << std::endl;
     std::cout << "║  👤 CHAMPION JOUÉ                                      ║" << std::endl;
@@ -81,10 +97,17 @@ void CarteChampion::jouer(Joueur* joueur) {
     }
 
     // ════════════════════════════════════════════════════════
-    // 2. VÉRIFIER LES ALLIÉS des champions DÉJÀ EN JEU
+    // 2. ENREGISTRER la faction AVANT de vérifier les alliés
     // ════════════════════════════════════════════════════════
     
-    // IMPORTANT : Vérifier les champions déjà en jeu AVANT d'enregistrer cette faction
+    if (faction != Faction::NONE) {
+        joueur->enregistrerFactionJouee(faction);
+    }
+
+    // ════════════════════════════════════════════════════════
+    // 3. VÉRIFIER LES ALLIÉS des champions DÉJÀ EN JEU
+    // ════════════════════════════════════════════════════════
+    
     if (faction != Faction::NONE) {
         auto& champions = joueur->zoneDeJeu().champions();
         for (auto* champion : champions) {
@@ -95,24 +118,15 @@ void CarteChampion::jouer(Joueur* joueur) {
     }
 
     // ════════════════════════════════════════════════════════
-    // 3. ENREGISTRER la faction de CE champion (APRÈS vérification des autres)
-    // ════════════════════════════════════════════════════════
-    
-    if (faction != Faction::NONE) {
-        joueur->enregistrerFactionJouee(faction);
-    }
-
-    // ════════════════════════════════════════════════════════
     // 4. VÉRIFIER si CE champion peut activer son propre allié
     // ════════════════════════════════════════════════════════
 
     if (aEffetAllie()) {
-        // Vérifier si une autre carte de la même faction a été jouée AVANT
-        bool allie_active = joueur->aJoueFaction(faction);
+        // L'effet allié s'active si au moins 2 cartes de la faction sont en jeu/jouées
+        int nb_cartes_faction = joueur->compterCartesJoueesFaction(faction);
         
-        if (allie_active) {
-            std::cout << "\n🤝 Effet ALLIÉ de " << nom << " activé ! (autre carte " 
-                      << getFactionNom() << " jouée)" << std::endl;
+        if (nb_cartes_faction >= 2) {
+            std::cout << "\n🤝 Effet ALLIÉ de " << nom << " activé !" << std::endl;
             activerAllie(joueur);
         } else {
             std::cout << "\n💤 Effet ALLIÉ disponible (jouez une autre carte " 
@@ -156,6 +170,10 @@ void CarteChampion::jouer(Joueur* joueur) {
     std::cout << "════════════════════════════════════════════════════════════" << std::endl;
 }
 
+// ════════════════════════════════════════════════════════
+// UTILISER LA CAPACITÉ EXPEND
+// ════════════════════════════════════════════════════════
+
 void CarteChampion::utiliserExpend(Joueur* joueur) {
     if (!joueur) {
         std::cerr << "❌ Erreur : Joueur invalide !" << std::endl;
@@ -195,6 +213,10 @@ void CarteChampion::utiliserExpend(Joueur* joueur) {
     std::cout << "   ✅ " << nom << " est maintenant EXPENDED" << std::endl;
 }
 
+// ════════════════════════════════════════════════════════
+// ACTIVER LES EFFETS ALLIÉS
+// ════════════════════════════════════════════════════════
+
 void CarteChampion::activerAllie(Joueur* joueur) {
     if (!joueur) return;
     
@@ -222,17 +244,27 @@ void CarteChampion::activerAllie(Joueur* joueur) {
     }
 }
 
+// ════════════════════════════════════════════════════════
+// VÉRIFIER ET ACTIVER ALLIÉ (pour champions déjà en jeu)
+// ════════════════════════════════════════════════════════
+
 void CarteChampion::verifierEtActiverAllie(Joueur* joueur) {
     if (!joueur || !aEffetAllie()) {
         return;
     }
     
-    // Vérifier si une carte de la même faction a été jouée ce tour
-    if (joueur->aJoueFaction(faction)) {
+    // Vérifier si au moins 2 cartes de la même faction sont en jeu/jouées
+    int nb_cartes_faction = joueur->compterCartesJoueesFaction(faction);
+    
+    if (nb_cartes_faction >= 2) {
         std::cout << "\n🤝 Effet ALLIÉ de " << nom << " (déjà en jeu) activé !" << std::endl;
         activerAllie(joueur);
     }
 }
+
+// ════════════════════════════════════════════════════════
+// DÉGÂTS ET GESTION DE L'ÉTAT
+// ════════════════════════════════════════════════════════
 
 void CarteChampion::subirDegats(int degats) {
     if (degats <= 0) return;
@@ -255,6 +287,10 @@ void CarteChampion::preparerPourNouveauTour() {
 void CarteChampion::reparer() {
     defense_actuelle = defense;
 }
+
+// ════════════════════════════════════════════════════════
+// AFFICHAGE
+// ════════════════════════════════════════════════════════
 
 void CarteChampion::afficher() const {
     Carte::afficher();
@@ -296,6 +332,10 @@ void CarteChampion::afficher() const {
     }
 }
 
+// ════════════════════════════════════════════════════════
+// GETTERS
+// ════════════════════════════════════════════════════════
+
 int CarteChampion::getDefense() const {
     return defense;
 }
@@ -328,16 +368,19 @@ bool CarteChampion::aEffetPrincipal() const {
     return (or_principal > 0 || combat_principal > 0 || soin_principal > 0 || pioche_principal > 0);
 }
 
+// Getters effets principaux
 int CarteChampion::getOrPrincipal() const { return or_principal; }
 int CarteChampion::getCombatPrincipal() const { return combat_principal; }
 int CarteChampion::getSoinPrincipal() const { return soin_principal; }
 int CarteChampion::getPiochePrincipal() const { return pioche_principal; }
 
+// Getters effets Expend
 int CarteChampion::getOrExpend() const { return or_expend; }
 int CarteChampion::getCombatExpend() const { return combat_expend; }
 int CarteChampion::getSoinExpend() const { return soin_expend; }
 int CarteChampion::getPiocheExpend() const { return pioche_expend; }
 
+// Getters effets alliés
 int CarteChampion::getOrAllie() const { return or_allie; }
 int CarteChampion::getCombatAllie() const { return combat_allie; }
 int CarteChampion::getSoinAllie() const { return soin_allie; }

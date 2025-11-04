@@ -78,6 +78,15 @@ public:
      */
     void reinitialiserFactionsJouees();
 
+     // ════════════════════════════════════════════════════════
+    // COMPTAGE DES CHAMPIONS (pour effets conditionnels)
+    // ════════════════════════════════════════════════════════
+    
+    int compterChampionsEnJeu() const;
+    int compterChampionsVivants() const;
+    int compterChampionsFaction(Faction faction) const;
+    int compterChampionsGarde() const;
+
     // ====== Affichage ======
     void afficherZones() const;
     void afficherMain() const;
@@ -96,6 +105,10 @@ public:
     const ZoneDeJeu& zoneDeJeu() const;
     const Defausse& defausse() const;
     const Sacrifice& sacrifice() const;
+
+    int compterCartesJoueesFaction(Faction faction) const;
+    
+    
 
 private:
     // Identité
@@ -118,6 +131,8 @@ private:
     // Suivi des factions jouées ce tour (pour effets alliés)
     // ════════════════════════════════════════════════════════
     std::vector<Faction> factions_jouees_ce_tour_;
+
+
 };
 
 #endif // JOUEUR_HPP
