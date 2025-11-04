@@ -549,10 +549,11 @@ void Jeu::phaseChampions(Joueur* joueur) {
     std::cout << "║  Actions disponibles                                   ║" << std::endl;
     std::cout << "╚════════════════════════════════════════════════════════╝" << std::endl;
     std::cout << "\n  [1] Utiliser une capacité EXPEND" << std::endl;
+    std::cout << "  [2] Activer un effet ALLIÉ" << std::endl;
     std::cout << "  [0] Retour" << std::endl;
     std::cout << "\nChoix: ";
     
-    int choix = lireEntier(0, 1);
+    int choix = lireEntier(0, 2);
     
     if (choix == 0) {
         return;
@@ -579,6 +580,45 @@ void Jeu::phaseChampions(Joueur* joueur) {
                 std::cout << "\n⚠️  " << champion->getNom() << " a déjà utilisé sa capacité Expend ce tour !" << std::endl;
             } else {
                 champion->utiliserExpend(joueur);
+            }
+        }
+    }
+    else if (choix == 2) {
+        // Activer un effet allié
+        std::cout << "\n╔════════════════════════════════════════════════════════╗" << std::endl;
+        std::cout << "║  Quel champion allié voulez-vous activer ?             ║" << std::endl;
+        std::cout << "╚════════════════════════════════════════════════════════╝" << std::endl;
+        
+        // Afficher seulement les champions qui peuvent activer leur effet allié
+        std::vector<int> indices_allies;
+        for (size_t i = 0; i < champions.size(); ++i) {
+            if (champions[i]) {
+                if (champions[i]->peutActiverAllie(joueur)) {
+                    indices_allies.push_back(i);
+                    std::cout << "  [" << (indices_allies.size()) << "] " 
+                              << champions[i]->getNom() 
+                              << " (" << champions[i]->getFactionNom() << ")" << std::endl;
+                }
+            }
+        }
+        
+        if (indices_allies.empty()) {
+            std::cout << "\n⚠️  Aucun champion ne peut activer son effet allié !" << std::endl;
+            std::cout << "   (Il faut au moins 2 cartes de la même faction en jeu)" << std::endl;
+        } else {
+            std::cout << "  [0] Annuler" << std::endl;
+            std::cout << "\nChoix: ";
+            
+            int choix_allie = lireEntier(0, static_cast<int>(indices_allies.size()));
+            
+            if (choix_allie > 0 && choix_allie <= static_cast<int>(indices_allies.size())) {
+                int index_champion = indices_allies[choix_allie - 1];
+                CarteChampion* champion = champions[index_champion];
+                
+                if (champion) {
+                    std::cout << "\n🤝 Activation de l'effet ALLIÉ de " << champion->getNom() << " !" << std::endl;
+                    champion->activerAllie(joueur, this);
+                }
             }
         }
     }

@@ -10,9 +10,11 @@ CarteChampion::CarteChampion(int quantity, const std::string& nom, int cout,
                              Faction faction, int defense, bool garde)
     : Carte(quantity, nom, cout, faction, CHAMPION),
       defense(defense), defense_actuelle(defense), est_garde(garde), est_expended(false),
+      allie_active_ce_tour(false),
       or_principal(0), combat_principal(0), soin_principal(0), pioche_principal(0),
       or_expend(0), combat_expend(0), soin_expend(0), pioche_expend(0),
-      or_allie(0), combat_allie(0), soin_allie(0), pioche_allie(0) {
+      or_allie(0), combat_allie(0), soin_allie(0), pioche_allie(0),
+      effet_special_allie_(nullptr) {
 }
 
 CarteChampion::~CarteChampion() {
@@ -41,6 +43,10 @@ void CarteChampion::setEffetAllie(int or_val, int combat_val, int soin_val, int 
     combat_allie = combat_val;
     soin_allie = soin_val;
     pioche_allie = pioche_val;
+}
+
+void CarteChampion::setEffetSpecialAllie(EffetSpecialChampionCallback effet) {
+    effet_special_allie_ = effet;
 }
 
 // ════════════════════════════════════════════════════════
@@ -217,10 +223,16 @@ void CarteChampion::utiliserExpend(Joueur* joueur) {
 // ACTIVER LES EFFETS ALLIÉS
 // ════════════════════════════════════════════════════════
 
-void CarteChampion::activerAllie(Joueur* joueur) {
+void CarteChampion::activerAllie(Joueur* joueur, Jeu* jeu) {
     if (!joueur) return;
     
-    if (!aEffetAllie()) {
+    if (!aEffetAllie() && !effet_special_allie_) {
+        return;
+    }
+    
+    // Vérifier si l'effet allié a déjà été activé ce tour
+    if (allie_active_ce_tour) {
+        std::cout << "⚠️  " << nom << " a déjà activé son effet allié ce tour !" << std::endl;
         return;
     }
     
@@ -242,14 +254,23 @@ void CarteChampion::activerAllie(Joueur* joueur) {
         std::cout << "      📚 Pioche " << pioche_allie << " carte(s)" << std::endl;
         joueur->piocher(pioche_allie);
     }
+    
+    // Activer l'effet spécial d'allié s'il existe
+    if (effet_special_allie_ && jeu) {
+        std::cout << "      ✨ Effet spécial d'allié :" << std::endl;
+        effet_special_allie_(joueur, jeu);
+    }
+    
+    // Marquer l'effet allié comme activé ce tour
+    allie_active_ce_tour = true;
 }
 
 // ════════════════════════════════════════════════════════
 // VÉRIFIER ET ACTIVER ALLIÉ (pour champions déjà en jeu)
 // ════════════════════════════════════════════════════════
 
-void CarteChampion::verifierEtActiverAllie(Joueur* joueur) {
-    if (!joueur || !aEffetAllie()) {
+void CarteChampion::verifierEtActiverAllie(Joueur* joueur, Jeu* jeu) {
+    if (!joueur || (!aEffetAllie() && !effet_special_allie_)) {
         return;
     }
     
@@ -258,7 +279,7 @@ void CarteChampion::verifierEtActiverAllie(Joueur* joueur) {
     
     if (nb_cartes_faction >= 2) {
         std::cout << "\n🤝 Effet ALLIÉ de " << nom << " (déjà en jeu) activé !" << std::endl;
-        activerAllie(joueur);
+        activerAllie(joueur, jeu);
     }
 }
 
@@ -282,6 +303,7 @@ void CarteChampion::subirDegats(int degats) {
 
 void CarteChampion::preparerPourNouveauTour() {
     est_expended = false;
+    allie_active_ce_tour = false;
 }
 
 void CarteChampion::reparer() {
@@ -361,7 +383,32 @@ bool CarteChampion::aEffetExpend() const {
 }
 
 bool CarteChampion::aEffetAllie() const {
-    return (or_allie > 0 || combat_allie > 0 || soin_allie > 0 || pioche_allie > 0);
+    bool a_numerique = (or_allie > 0 || combat_allie > 0 || soin_allie > 0 || pioche_allie > 0);
+    bool a_special = (effet_special_allie_ != nullptr);
+    
+    return a_numerique || a_special;
+}
+
+bool CarteChampion::peutActiverAllie(Joueur* joueur) const {
+    if (!joueur || !aEffetAllie()) {
+        return false;
+    }
+    
+    // Vérifier si l'effet allié a déjà été activé ce tour
+    if (allie_active_ce_tour) {
+        return false;
+    }
+    
+    // Compter les champions de la même faction EN JEU (sans se compter soi-même)
+    int nb_autres_champions = 0;
+    for (const auto* champion : joueur->zoneDeJeu().champions()) {
+        if (champion && champion != this && champion->getFaction() == faction) {
+            nb_autres_champions++;
+        }
+    }
+    
+    // Il faut au moins 1 AUTRE champion de la même faction
+    return nb_autres_champions >= 1;
 }
 
 bool CarteChampion::aEffetPrincipal() const {
