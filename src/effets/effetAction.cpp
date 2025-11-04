@@ -111,7 +111,7 @@ void EffetAction::preparerChampion(Joueur* joueur, Game* /*game*/) {
     
     if (choix > 0 && choix <= static_cast<int>(expended_champions.size())) {
         CarteChampion* champion = expended_champions[choix - 1];
-        champion->reparer(); // ← CORRIGÉ : reparer() au lieu de preparer()
+        champion->reparer();
         std::cout << "   ✅ " << champion->getNom() << " est maintenant prêt !" << std::endl;
     } else {
         std::cout << "   ⚠️  Choix invalide" << std::endl;
@@ -137,7 +137,6 @@ void EffetAction::sacrifierAutreCarte(Joueur* joueur, Game* /*game*/) {
     
     // Cartes de la main
     for (size_t i = 0; i < joueur->main().taille(); ++i) {
-        // ← CORRIGÉ : const_cast pour convertir const Carte* en Carte*
         Carte* carte = const_cast<Carte*>(joueur->main().getCarte(i));
         if (carte) {
             cartes_sacrifiables.push_back(carte);
@@ -147,7 +146,6 @@ void EffetAction::sacrifierAutreCarte(Joueur* joueur, Game* /*game*/) {
     
     // Cartes de la défausse
     for (size_t i = 0; i < joueur->defausse().taille(); ++i) {
-        // ← CORRIGÉ : const_cast pour convertir const Carte* en Carte*
         Carte* carte = const_cast<Carte*>(joueur->defausse().getCarte(i));
         if (carte) {
             cartes_sacrifiables.push_back(carte);
@@ -196,7 +194,6 @@ void EffetAction::sacrifierAutreCarte(Joueur* joueur, Game* /*game*/) {
                 }
             }
         } else {
-            // ← CORRIGÉ : utiliser retirerCarte(Carte*) au lieu de retirerCarte(size_t)
             joueur->defausse().retirerCarte(carte);
         }
         
@@ -241,13 +238,8 @@ void EffetAction::defausseSurDeck(Joueur* joueur, Game* /*game*/) {
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     
     if (choix > 0 && choix <= static_cast<int>(joueur->defausse().taille())) {
-        // ← CORRIGÉ : const_cast pour convertir const Carte* en Carte*
         Carte* carte = const_cast<Carte*>(joueur->defausse().getCarte(choix - 1));
-        
-        // ← CORRIGÉ : utiliser retirerCarte(Carte*) au lieu de retirerCarte(int)
         joueur->defausse().retirerCarte(carte);
-        
-        // ← CORRIGÉ : utiliser ajouterDessus() au lieu de ajouterCarteAuDessus()
         joueur->pioche().ajouterDessus(carte);
         
         std::cout << "   ✅ " << carte->getNom() << " placée sur le dessus du deck !" << std::endl;

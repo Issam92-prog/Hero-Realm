@@ -197,7 +197,7 @@ void Jeu::executerTour(Joueur* joueur) {
                     tour_termine = true;
                 }
                 break;
-            case 8:  // ← NOUVEAU : God Mode
+            case 8:
                 if (god_mode_) {
                     god_mode_->afficherMenu();
                 } else {

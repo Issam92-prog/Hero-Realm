@@ -13,9 +13,9 @@ CarteAction::CarteAction(int quantity, const std::string& nom, int cout, Faction
       or_allie(0), combat_allie(0), soin_allie(0), pioche_allie(0),
       or_sacrifice(0), combat_sacrifice(0), soin_sacrifice(0), pioche_sacrifice(0),
       a_effet_sacrifice(false),
-      effet_special_principal_(nullptr),  // ← NOUVEAUTÉ
-      effet_special_allie_(nullptr),      // ← NOUVEAUTÉ
-      effet_special_sacrifice_(nullptr) { // ← NOUVEAUTÉ
+      effet_special_principal_(nullptr),
+      effet_special_allie_(nullptr),
+      effet_special_sacrifice_(nullptr) {
 }
 
 CarteAction::~CarteAction() {
@@ -81,10 +81,6 @@ void CarteAction::setEffetSacrifice(int or_val, int combat_val, int soin_val, in
     pioche_sacrifice = pioche_val;
     a_effet_sacrifice = (or_val > 0 || combat_val > 0 || soin_val > 0 || pioche_val > 0);
 }
-
-// ════════════════════════════════════════════════════════
-// SETTERS POUR EFFETS SPÉCIAUX (NOUVEAUTÉ)
-// ════════════════════════════════════════════════════════
 
 void CarteAction::setEffetSpecialPrincipal(EffetSpecialCallback effet) {
     effet_special_principal_ = effet;
@@ -158,13 +154,10 @@ void CarteAction::jouer(Joueur* joueur) {
         std::cout << "   ℹ️  Aucun effet principal" << std::endl;
     }
 
-    // ════════════════════════════════════════════════════════
-    // 2. EFFET SPÉCIAL PRINCIPAL (NOUVEAUTÉ)
-    // ════════════════════════════════════════════════════════
-
+    // Effet spécial principal
     if (effet_special_principal_) {
         std::cout << "\n✨ Effet spécial principal :" << std::endl;
-        effet_special_principal_(joueur, nullptr); // nullptr = Game non disponible pour l'instant
+        effet_special_principal_(joueur, nullptr);
     }
 
      // ════════════════════════════════════════════════════════
@@ -261,10 +254,7 @@ void CarteAction::activerAllie(Joueur* joueur) {
         }
     }
 
-    // ════════════════════════════════════════════════════════
-    // EFFET SPÉCIAL ALLIÉ (NOUVEAUTÉ)
-    // ════════════════════════════════════════════════════════
-
+    // Effet spécial allié
     if (effet_special_allie_) {
         std::cout << "\n   ✨ Effet spécial allié :" << std::endl;
         effet_special_allie_(joueur, nullptr);
@@ -301,10 +291,7 @@ void CarteAction::sacrifier(Joueur* joueur) {
         }
     }
 
-    // ════════════════════════════════════════════════════════
-    // EFFET SPÉCIAL SACRIFICE (NOUVEAUTÉ)
-    // ════════════════════════════════════════════════════════
-
+    // Effet spécial sacrifice
     if (effet_special_sacrifice_) {
         std::cout << "\n   ✨ Effet spécial de sacrifice :" << std::endl;
         effet_special_sacrifice_(joueur, nullptr);

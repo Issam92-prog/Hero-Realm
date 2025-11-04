@@ -100,10 +100,6 @@ void EffetChampion::krakaHighPriestAlly(Joueur* joueur, Jeu* jeu) {
     joueur->piocher(1);
 }
 
-// ════════════════════════════════════════════════════════
-// NOUVEAUX EFFETS - CHOIX BINAIRES
-// ════════════════════════════════════════════════════════
-
 void EffetChampion::darianWarMageExpend(Joueur* joueur, Jeu* jeu) {
     if (!joueur || !jeu) {
         std::cerr << "❌ Erreur : Joueur ou Jeu invalide !" << std::endl;
@@ -147,10 +143,6 @@ void EffetChampion::streetThugExpend(Joueur* joueur, Jeu* jeu) {
         std::cout << "      ✅ +2 combat" << std::endl;
     }
 }
-
-// ════════════════════════════════════════════════════════
-// NOUVEAUX EFFETS - SACRIFICE AVEC BONUS
-// ════════════════════════════════════════════════════════
 
 void EffetChampion::krythosMasterVampireExpend(Joueur* joueur, Jeu* jeu) {
     if (!joueur || !jeu) {
@@ -290,10 +282,6 @@ void EffetChampion::lysTheUnseenExpend(Joueur* joueur, Jeu* jeu) {
     std::cout << "      ✅ +2 combat supplémentaire" << std::endl;
 }
 
-// ════════════════════════════════════════════════════════
-// NOUVEAUX EFFETS - ADVERSAIRE DÉFAUSSE
-// ════════════════════════════════════════════════════════
-
 void EffetChampion::broelynLoreweaverAlly(Joueur* joueur, Jeu* jeu) {
     if (!joueur || !jeu) {
         std::cerr << "❌ Erreur : Joueur ou Jeu invalide !" << std::endl;
@@ -314,10 +302,6 @@ void EffetChampion::torgenRocksplitterExpend(Joueur* joueur, Jeu* jeu) {
     std::cout << "      ⚠️  (Fonctionnalité nécessitant accès au Plateau - à implémenter dans Jeu)" << std::endl;
 }
 
-// ════════════════════════════════════════════════════════
-// NOUVEAUX EFFETS - ASSOMMER CHAMPION
-// ════════════════════════════════════════════════════════
-
 void EffetChampion::rakeMasterAssassinExpend(Joueur* joueur, Jeu* jeu) {
     if (!joueur || !jeu) {
         std::cerr << "❌ Erreur : Joueur ou Jeu invalide !" << std::endl;
@@ -334,10 +318,6 @@ void EffetChampion::rakeMasterAssassinExpend(Joueur* joueur, Jeu* jeu) {
     std::cout << "      🎯 Assommer un champion adverse" << std::endl;
     std::cout << "      ⚠️  (Fonctionnalité nécessitant accès au Plateau - à implémenter dans Jeu)" << std::endl;
 }
-
-// ════════════════════════════════════════════════════════
-// NOUVEAUX EFFETS - PIOCHER/DÉFAUSSER OPTIONNEL
-// ════════════════════════════════════════════════════════
 
 void EffetChampion::grakStormGiantExpend(Joueur* joueur, Jeu* jeu) {
     if (!joueur || !jeu) {
@@ -372,10 +352,6 @@ void EffetChampion::grakStormGiantExpend(Joueur* joueur, Jeu* jeu) {
     
     std::cout << "      ✅ " << carte->getNom() << " défaussée" << std::endl;
 }
-
-// ════════════════════════════════════════════════════════
-// NOUVEAUX EFFETS - MANIPULATION DE DECK
-// ════════════════════════════════════════════════════════
 
 void EffetChampion::varrickNecromancerExpend(Joueur* joueur, Jeu* jeu) {
     if (!joueur || !jeu) {

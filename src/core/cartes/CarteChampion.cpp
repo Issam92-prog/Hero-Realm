@@ -26,10 +26,6 @@ CarteChampion::~CarteChampion() {
 // ════════════════════════════════════════════════════════
 
 CarteChampion* CarteChampion::clone() const {
-    std::cout << "🔧 DEBUG clone() appelé pour: " << nom << " (adresse source: " << this << ")" << std::endl;
-    std::cout << "   - effet_special_expend_ source: " << (effet_special_expend_ ? "NON-NULL" : "NULL") << std::endl;
-    std::cout << "   - effet_special_allie_ source: " << (effet_special_allie_ ? "NON-NULL" : "NULL") << std::endl;
-    
     CarteChampion* copie = new CarteChampion(quantity, nom, cout, faction, defense, est_garde);
     copie->setDescription(description);
     
@@ -54,10 +50,6 @@ CarteChampion* CarteChampion::clone() const {
     // IMPORTANT : Copier les lambdas (std::function supporte la copie)
     copie->effet_special_allie_ = effet_special_allie_;
     copie->effet_special_expend_ = effet_special_expend_;
-    
-    std::cout << "   - Copie créée à l'adresse: " << copie << std::endl;
-    std::cout << "   - effet_special_expend_ copié: " << (copie->effet_special_expend_ ? "NON-NULL" : "NULL") << std::endl;
-    std::cout << "   - effet_special_allie_ copié: " << (copie->effet_special_allie_ ? "NON-NULL" : "NULL") << std::endl;
     
     return copie;
 }
@@ -91,9 +83,6 @@ void CarteChampion::setEffetSpecialAllie(EffetSpecialChampionCallback effet) {
     effet_special_allie_ = effet;
 }
 
-// ════════════════════════════════════════════════════════
-// NOUVEAU : Setter pour effet spécial d'expend
-// ════════════════════════════════════════════════════════
 void CarteChampion::setEffetSpecialExpend(EffetSpecialChampionCallback effet) {
     effet_special_expend_ = effet;
 }
@@ -265,9 +254,7 @@ void CarteChampion::utiliserExpend(Joueur* joueur, Jeu* jeu) {
         joueur->piocher(pioche_expend);
     }
     
-    // ════════════════════════════════════════════════════════
-    // NOUVEAU : Appeler l'effet spécial d'expend s'il existe
-    // ════════════════════════════════════════════════════════
+    // Effet spécial d'expend
     if (effet_special_expend_ && jeu) {
         std::cout << "   ✨ Effet spécial d'expend :" << std::endl;
         effet_special_expend_(joueur, jeu);
@@ -439,14 +426,6 @@ bool CarteChampion::estVivant() const {
 bool CarteChampion::aEffetExpend() const {
     bool a_numerique = (or_expend > 0 || combat_expend > 0 || soin_expend > 0 || pioche_expend > 0);
     bool a_special = (effet_special_expend_ != nullptr);
-    
-    // DEBUG CRITIQUE
-    std::cout << "\n🔍 DEBUG aEffetExpend() pour " << nom << ":" << std::endl;
-    std::cout << "   - Adresse de cette carte: " << this << std::endl;
-    std::cout << "   - effet_special_expend_ pointer: " << effet_special_expend_.target<void(Joueur*, Jeu*)>() << std::endl;
-    std::cout << "   - a_numerique: " << (a_numerique ? "OUI" : "NON") << std::endl;
-    std::cout << "   - a_special: " << (a_special ? "OUI" : "NON") << std::endl;
-    std::cout << "   - RESULTAT: " << ((a_numerique || a_special) ? "OUI" : "NON") << std::endl;
     
     return a_numerique || a_special;
 }

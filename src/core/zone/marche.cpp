@@ -21,13 +21,9 @@ Marche::~Marche() {
     nettoyer();
 }
 
-// ════════════════════════════════════════════════════════
-// INITIALISATION - VERSION CORRIGÉE AVEC clone()
-// ════════════════════════════════════════════════════════
-
 void Marche::initialiser() {
     std::cout << "\n╔════════════════════════════════════════════════════════╗" << std::endl;
-    std::cout << "║  🏪 INITIALISATION DU MARCHÉ (avec clone())            ║" << std::endl;
+    std::cout << "║  🏪 INITIALISATION DU MARCHÉ                           ║" << std::endl;
     std::cout << "╚════════════════════════════════════════════════════════╝" << std::endl;
 
     // Nettoyer si déjà initialisé
@@ -88,7 +84,7 @@ void Marche::initialiser() {
     // Révéler les 5 premières cartes
     remplirMarche();
 
-    std::cout << "✅ Marché initialisé avec clone() !" << std::endl;
+    std::cout << "✅ Marché initialisé !" << std::endl;
 }
 
 void Marche::nettoyer() {

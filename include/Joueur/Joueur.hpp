@@ -45,7 +45,7 @@ public:
 
     // ====== Pioche ======
     void piocher(int n = 1);
-    void initialiserDeckDeBase(int nb_cartes_initiales = 5);
+    void initialiserDeckDeBase();
 
     // ====== Gestion des Champions ======
     void jouerChampion(CarteChampion* champion);
